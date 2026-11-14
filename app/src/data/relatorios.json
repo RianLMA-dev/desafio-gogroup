@@ -1,0 +1,344 @@
+{
+ "promessa": {
+  "causa": "promessa",
+  "titulo": "Incidente Crítico: Cálculo de Prazo Prometido em Dias Corridos no Checkout",
+  "severidade": "crítica",
+  "resumo_executivo": "O sistema de checkout está calculando o prazo de entrega somando dias corridos, ignorando fins de semana e feriados, o que gera promessas irreais. Isso resulta em 148 exceções abertas hoje e um custo mensal de R$ 1.544 em retrabalho e horas de equipe.",
+  "o_que_acontece": "O módulo de checkout soma o SLA da transportadora em dias corridos em vez de dias úteis. Consequentemente, 100% das 2.042 datas prometidas no período foram calculadas incorretamente, fazendo com que a promessa saia em média 1,9 dias úteis antes do prazo real possível (variando até 5 dias).",
+  "evidencias": [
+   "100% das 2.042 datas prometidas foram calculadas como data do pedido + 1 + SLA em dias corridos, contrariando a regra de dias úteis.",
+   "A promessa de entrega sai em média 1,9 dias úteis antes do prazo possível, com casos extremos de até 5 dias de diferença.",
+   "151 dos 510 atrasos registrados (30%) estão, na verdade, dentro do prazo correto quando ajustado para dias úteis, indicando 'falsos atrasos'.",
+   "Existem 148 exceções abertas hoje diretamente ligadas a este erro de cálculo, representando o total de casos acima do normal no período de 58 dias.",
+   "O gráfico de distribuição mostra que 1.274 casos (maioria) têm uma diferença de 2 dias entre a promessa e o prazo correto."
+  ],
+  "causa_raiz": "O código do checkout está somando o SLA da transportadora em dias corridos, ignorando a lógica de dias úteis e o calendário de feriados (incluindo o feriado de 07/09).",
+  "impacto": "Custo mensal de R$ 1.544 e consumo de 15 horas do time por mês para tratar exceções e retrabalho.",
+  "acoes": [
+   {
+    "acao": "Corrigir o cálculo da data prometida no checkout para considerar dias úteis e incluir o calendário de feriados.",
+    "responsavel": "Tecnologia (checkout)",
+    "prazo": "48h"
+   },
+   {
+    "acao": "Validar a correção com testes de ponta a ponta em cenários que envolvam fins de semana e feriados.",
+    "responsavel": "QA / Tecnologia",
+    "prazo": "48h"
+   },
+   {
+    "acao": "Revisar as 148 exceções abertas hoje para encerrar as que são 'falsos atrasos' e atualizar a comunicação com os clientes.",
+    "responsavel": "Operação / Suporte",
+    "prazo": "hoje"
+   },
+   {
+    "acao": "Implementar monitoramento automático para alertar se o cálculo de prazo voltar a usar dias corridos.",
+    "responsavel": "Tecnologia (checkout)",
+    "prazo": "1 semana"
+   }
+  ],
+  "pedidos_afetados": "As 148 exceções abertas hoje devem ser triadas imediatamente: aquelas que estão dentro do prazo correto (dias úteis) devem ser encerradas como 'falso atraso' e o cliente notificado com a data correta; as que realmente estão atrasadas devem seguir o fluxo normal de resolução.",
+  "como_medir": "Taxa de exceções de atraso na entrega que são classificadas como 'falso atraso' (dentro do prazo correto em dias úteis). O objetivo é reduzir essa taxa para 0% após a correção.",
+  "modelo": "qwen/qwen3.8-27b",
+  "simulado": false,
+  "gerado_em": "2026-11-14T14:18:25.387Z"
+ },
+ "rota_ne": {
+  "causa": "rota_ne",
+  "titulo": "Incidente de Atraso na Rota Express no Nordeste",
+  "severidade": "alta",
+  "resumo_executivo": "A Rota Express apresenta 66% das exceções de atraso ou rastreio parado no Nordeste, dobrando de volume desde 31/08. O impacto mensal é de R$5.328 e 27h de equipe.",
+  "o_que_acontece": "A malha de entrega da Rota Express no Nordeste sofreu queda de desempenho, gerando aumento de atrasos e rastreios parados, concentrados em PB, PE, RN, CE e BA.",
+  "evidencias": [
+   "66% das exceções da Rota Express são atraso ou rastreio parado, versus 14% nas outras transportadoras da região.",
+   "A partir de 31/08 os atrasos semanais mais que dobraram, com 73 casos na semana de 31/08.",
+   "A Rota Express é responsável por 312 exceções abertas, 259 casos acima do normal em 58 dias.",
+   "Custo mensal de R$5.328 e 27h de equipe dedicado a resolver esses incidentes."
+  ],
+  "causa_raiz": "Queda de desempenho da Rota Express na malha do Nordeste desde o fim de agosto (capacidade, hub regional ou mudança operacional).",
+  "impacto": "Custo mensal de R$5.328 e 27h de equipe por mês.",
+  "acoes": [
+   {
+    "acao": "Cobrar o SLA contratado e plano de ação da Rota Express",
+    "responsavel": "Logística (gestão de transportadoras)",
+    "prazo": "hoje"
+   },
+   {
+    "acao": "Redirecionar pedidos para PB, RN e PE a outra transportadora até normalizar",
+    "responsavel": "Logística (gestão de transportadoras)",
+    "prazo": "48h"
+   },
+   {
+    "acao": "Abrir chamado em lote para os pedidos parados (Agente de Fila já faz)",
+    "responsavel": "Agente de Fila",
+    "prazo": "hoje"
+   }
+  ],
+  "pedidos_afetados": "Manter os pedidos abertos em fila de espera, priorizando reenvio para transportadora alternativa e monitorar status via SLA",
+  "como_medir": "Redução de 50% nas exceções de atraso/rastreio parado no Nordeste em 30 dias e retorno do custo mensal abaixo de R$2.500",
+  "modelo": "openai/gpt-oss-20b",
+  "simulado": false,
+  "gerado_em": "2026-11-14T14:14:41.463Z"
+ },
+ "carga_norte": {
+  "causa": "carga_norte",
+  "titulo": "Incidente Crítico: Avarias em Produtos Frágeis pela Transportadora Carga Norte",
+  "severidade": "crítica",
+  "resumo_executivo": "A Carga Norte é responsável por 102 das 192 avarias registradas, representando 30% das exceções da transportadora, contra uma média de 5% nas demais. O problema está concentrado em itens de vidro e fragrâncias, gerando um custo mensal de R$ 4.516 e 9 horas de trabalho do time.",
+  "o_que_acontece": "Há um padrão anormal de avarias em produtos frágeis (Lescent, Barbour's e Rituária) transportados pela Carga Norte. Enquanto outras transportadoras apresentam taxas de avaria entre 2,3% e 9,8%, a Carga Norte registra 29,6% de seus casos como avarias, indicando falha sistêmica no manuseio ou embalagem para essa rota.",
+  "evidencias": [
+   "102 das 192 avarias totais são da Carga Norte, o que equivale a 30% das exceções dela, contra 5% nas outras transportadoras.",
+   "A taxa de avaria da Carga Norte é de 29,6% (102 casos em 345 exceções), muito acima da Rota Express (2,3%) e da Postal Nacional (9,8%).",
+   "As avarias estão concentradas em fragrâncias e itens em vidro, especificamente das marcas Lescent, Barbour's e Rituária.",
+   "100% das avarias da marca Rituária ocorreram com a transportadora Carga Norte.",
+   "Há 98 exceções abertas ligadas a esse padrão e 84 casos acima do normal registrados nos últimos 58 dias."
+  ],
+  "causa_raiz": "Manuseio inadequado de volumes frágeis pela Carga Norte ou embalagem insuficiente para itens de vidro nas rotas atendidas por ela.",
+  "impacto": "Custo mensal de R$ 4.516 em produtos danificados e 9 horas de trabalho do time operacional por mês para tratamento das exceções.",
+  "acoes": [
+   {
+    "acao": "Cobrar ressarcimento formal das avarias registradas pela Carga Norte",
+    "responsavel": "Logística (gestão de transportadoras)",
+    "prazo": "48h"
+   },
+   {
+    "acao": "Exigir protocolo de manuseio de frágil ou reforçar a embalagem de fragrâncias e vidro antes do despacho para a Carga Norte",
+    "responsavel": "Logística (gestão de transportadoras)",
+    "prazo": "hoje"
+   },
+   {
+    "acao": "Avaliar a troca da transportadora para itens em vidro e fragrâncias, redirecionando para Rota Express ou Veloz Log",
+    "responsavel": "Logística (gestão de transportadoras)",
+    "prazo": "1 semana"
+   }
+  ],
+  "pedidos_afetados": "Segurar o despacho de novos itens frágeis para a Carga Norte até a implementação do novo protocolo de embalagem; para os 98 pedidos abertos com avaria, priorizar o reembolso ou reenvio imediato via transportadora alternativa (Rota Express) para minimizar a insatisfação do cliente.",
+  "como_medir": "Taxa de avaria da Carga Norte para itens frágeis (vidro/fragrância), que deve cair para menos de 5% nos próximos 30 dias.",
+  "modelo": "qwen/qwen3.8-27b",
+  "simulado": false,
+  "gerado_em": "2026-11-14T14:14:59.425Z"
+ },
+ "imp02": {
+  "causa": "imp02",
+  "titulo": "Falhas de Personalização na Impressora IMP-02",
+  "severidade": "alta",
+  "resumo_executivo": "A IMP-02 apresenta 77 falhas de personalização, representando 47% dos pedidos com exceção, o que excede em 36 pontos percentuais o índice das demais impressoras. O problema começou em 24/08 e tem piorado, atingindo 18 falhas por semana.",
+  "o_que_acontece": "A máquina IMP-02 está gerando falhas de personalização em 77 pedidos, totalizando R$ 2.875,64 de custo mensal e consumindo 6,18 horas do time por mês.",
+  "evidencias": [
+   "77 das 130 falhas de personalização vêm da IMP-02: 47% dos pedidos dela com exceção, contra 11% nas outras 5 impressoras.",
+   "Falha nos 3 turnos — não é operador, é a máquina.",
+   "Começou por volta de 24/08 e está piorando (de 0–3 para 11–18 falhas por semana)."
+  ],
+  "causa_raiz": "Defeito na IMP-02 (cabeçote, calibração ou alinhamento) surgido no fim de agosto.",
+  "impacto": "Custo mensal de R$ 2.876 e 6,18 horas do time por mês.",
+  "acoes": [
+   {
+    "acao": "Parar a IMP-02 para manutenção e calibração",
+    "responsavel": "Manutenção (CD1)",
+    "prazo": "hoje"
+   },
+   {
+    "acao": "Redirecionar a produção para IMP-01 e IMP-03 enquanto isso",
+    "responsavel": "Operação de Produção",
+    "prazo": "48h"
+   },
+   {
+    "acao": "Reproduzir as personalizações com falha em outra impressora (Agente de Fila já faz)",
+    "responsavel": "Agente de Fila",
+    "prazo": "48h"
+   }
+  ],
+  "pedidos_afetados": "Reprocessar os 77 pedidos abertos na IMP-02 e garantir que sejam concluídos em impressoras alternativas.",
+  "como_medir": "Redução das falhas de personalização da IMP-02 para 0 e taxa de falha abaixo de 5% em todas as impressoras.",
+  "modelo": "openai/gpt-oss-20b",
+  "simulado": false,
+  "gerado_em": "2026-11-14T14:15:09.224Z"
+ },
+ "cd2_noite": {
+  "causa": "cd2_noite",
+  "titulo": "Incidente de Separação de Kits com Brinde no CD2 – Turno da Noite",
+  "severidade": "alta",
+  "resumo_executivo": "215 de 285 itens faltantes (46% das exceções do turno da noite) foram identificados no CD2, sendo 160 desses pedidos de campanha com brinde. O problema persiste desde agosto, indicando falha sistêmica no processo de montagem.",
+  "o_que_acontece": "Durante o turno da noite no CD2, a equipe de separação está omitindo itens de kits de campanha, resultando em pedidos com brinde incompletos e aumentando o volume de exceções.",
+  "evidencias": [
+   "215 dos 285 itens faltantes saíram do CD2 no turno da noite (46% das exceções desse turno, contra 4% no resto).",
+   "160 deles são pedidos de campanha com brinde.",
+   "Constante desde o início de agosto: é processo, não um evento."
+  ],
+  "causa_raiz": "Falta de conferência ou checklist de montagem de kits de campanha no turno da noite do CD2.",
+  "impacto": "Custo mensal de R$7.746 e 20,1 horas de trabalho do time dedicado a correções de exceções.",
+  "acoes": [
+   {
+    "acao": "Implementar conferência obrigatória (bipagem ou peso) para pedidos com brinde no CD2 à noite.",
+    "responsavel": "Gestão do CD2",
+    "prazo": "hoje"
+   },
+   {
+    "acao": "Treinar a equipe da noite na montagem de kits de campanha.",
+    "responsavel": "Gestão de Operações",
+    "prazo": "48h"
+   },
+   {
+    "acao": "Pedir foto e reenviar o item faltante (Agente de Fila já faz).",
+    "responsavel": "Equipe de Atendimento",
+    "prazo": "48h"
+   }
+  ],
+  "pedidos_afetados": "Reprocessar todos os pedidos abertos do turno da noite do CD2 que contenham brinde, enviando correções e atualizando status para ‘em análise’.",
+  "como_medir": "Reduzir a taxa de itens faltantes no CD2 à noite para <5% das exceções totais em 1 semana.",
+  "modelo": "openai/gpt-oss-20b",
+  "simulado": false,
+  "gerado_em": "2026-11-14T14:15:18.892Z"
+ },
+ "lote": {
+  "causa": "lote",
+  "titulo": "Incidente Crítico: Defeito de Fabricação no Lote L2607-B (Condicionador Ápice 1000ml)",
+  "severidade": "crítica",
+  "resumo_executivo": "Identificado defeito de fabricação no lote L2607-B do Condicionador Ápice 1000ml, responsável por 76 dos 113 vazamentos registrados. A falha impacta 74 pedidos abertos e gera custo mensal de R$ 3.166.",
+  "o_que_acontece": "O lote L2607-B apresenta uma taxa anormal de vazamentos, com 76 ocorrências do mesmo produto, enquanto nenhum outro lote ultrapassa 6 casos. Isso indica um problema sistêmico de qualidade (tampa, lacre ou envase) específico deste lote.",
+  "evidencias": [
+   "76 dos 113 vazamentos totais são do Condicionador Ápice 1000ml, lote L2607-B.",
+   "76 dos 84 problemas registrados para este produto específico são do tipo vazamento.",
+   "Nenhum outro lote apresenta mais de 6 vazamentos, isolando o problema no L2607-B.",
+   "Há 74 exceções abertas ligadas diretamente a este lote.",
+   "O custo mensal estimado é de R$ 3.166 e o impacto operacional é de 7,66 horas do time por mês."
+  ],
+  "causa_raiz": "Defeito de fabricação no lote L2607-B, possivelmente relacionado à integridade da tampa, lacre ou processo de envase.",
+  "impacto": "Custo financeiro de R$ 3.166 por mês e consumo de 7,66 horas do time operacional mensalmente, além do risco de reputação por reenvios e devoluções.",
+  "acoes": [
+   {
+    "acao": "Bloquear imediatamente todo o estoque restante do lote L2607-B no WMS/CD.",
+    "responsavel": "Operação/CD1",
+    "prazo": "hoje"
+   },
+   {
+    "acao": "Acionar o fornecedor para notificar o defeito e solicitar ressarcimento formal.",
+    "responsavel": "Compras",
+    "prazo": "48h"
+   },
+   {
+    "acao": "Identificar e reenviar os 74 pedidos abertos com o lote defeituoso, utilizando estoque de lotes íntegros.",
+    "responsavel": "Logística/Atendimento",
+    "prazo": "48h"
+   },
+   {
+    "acao": "Realizar auditoria de qualidade nos lotes próximos (L2608-A e L2608-C) para garantir que não há contaminação cruzada.",
+    "responsavel": "Qualidade",
+    "prazo": "1 semana"
+   }
+  ],
+  "pedidos_afetados": "Reenviar imediatamente os 74 pedidos abertos associados ao lote L2607-B com produto de outro lote íntegro, cancelando o envio do item defeituoso.",
+  "como_medir": "Monitorar a taxa de exceções de vazamento por lote; o indicador deve retornar a menos de 6 casos por lote, alinhando-se à média histórica dos demais lotes.",
+  "modelo": "qwen/qwen3.8-27b",
+  "simulado": false,
+  "gerado_em": "2026-11-14T14:15:29.466Z"
+ },
+ "kokeshi": {
+  "causa": "kokeshi",
+  "titulo": "Ruptura de Estoque Recorrente em SKUs Kokeshi",
+  "severidade": "alta",
+  "resumo_executivo": "O site continua vendendo 3 produtos Kokeshi sem estoque físico, gerando 39 das 123 rupturas pós-venda recentes. O problema é recorrente desde agosto e impacta diretamente a experiência do cliente e a operação logística.",
+  "o_que_acontece": "Os SKUs KSH-1010, KSH-1011 e KSH-1009 estão disponíveis para compra no e-commerce, mas não há unidades em estoque para envio, resultando em exceções de ruptura pós-venda.",
+  "evidencias": [
+   "39 das 123 rupturas pós-venda são de 3 produtos Kokeshi: Óleo de Rosa Mosqueta, Geleia Facial de Colágeno e Sérum Adeus Olheiras.",
+   "No Óleo de Rosa Mosqueta (KSH-1010), 75% das exceções são ruptura.",
+   "Acontece toda semana, desde agosto.",
+   "Há 37 exceções abertas ligadas a esse padrão."
+  ],
+  "causa_raiz": "Estoque desses SKUs não está sincronizado com o site (ou sem estoque de segurança).",
+  "impacto": "Custo mensal de R$ 1040 e 4 horas do time por mês.",
+  "acoes": [
+   {
+    "acao": "Revisar a sincronização de estoque desses SKUs com o site.",
+    "responsavel": "E-commerce e Planejamento",
+    "prazo": "hoje"
+   },
+   {
+    "acao": "Criar estoque de segurança ou pausar a venda quando o saldo ficar baixo.",
+    "responsavel": "E-commerce e Planejamento",
+    "prazo": "48h"
+   },
+   {
+    "acao": "Oferecer troca ou reembolso aos clientes afetados (pessoa decide).",
+    "responsavel": "Suporte ao Cliente",
+    "prazo": "1 semana"
+   }
+  ],
+  "pedidos_afetados": "Contatar os clientes dos 37 pedidos abertos para oferecer troca ou reembolso, conforme decisão da liderança.",
+  "como_medir": "Redução a zero das rupturas pós-venda nos SKUs Kokeshi nas próximas 2 semanas.",
+  "modelo": "qwen/qwen3.8-27b",
+  "simulado": false,
+  "gerado_em": "2026-11-14T14:15:39.664Z"
+ },
+ "duplicados": {
+  "causa": "duplicados",
+  "titulo": "Duplicidade de exceções no sistema",
+  "severidade": "alta",
+  "resumo_executivo": "42 exceções duplicadas foram identificadas, gerando retrabalho e risco de perda de dados. A causa raiz é a falta de verificação de existência de exceção antes da abertura.",
+  "o_que_acontece": "O sistema permite a abertura de exceções mesmo quando já existe uma aberta para o mesmo pedido e tipo, resultando em 42 registros duplicados em 58 dias.",
+  "evidencias": [
+   "42 exceções têm o mesmo pedido e o mesmo tipo de outra já aberta, muitas vezes com status diferentes.",
+   "Exemplos de pedidos afetados: GB7014112 (Ruptura pós-venda), GB7015569 (Atraso na entrega), GB7010212 (Pagamento pendente), GB7009833 (Rastreio parado), GB7016697 (Atraso na entrega).",
+   "Horas do time por mês afetadas: 4.34 horas."
+  ],
+  "causa_raiz": "A abertura de exceção não verifica se já existe uma aberta para o mesmo pedido e tipo.",
+  "impacto": "Custo mensal: R$0; Horas do time: 4.34 horas/mês.",
+  "acoes": [
+   {
+    "acao": "Bloquear abertura duplicada no sistema",
+    "responsavel": "Tecnologia",
+    "prazo": "48h"
+   },
+   {
+    "acao": "Fechar as duplicadas automaticamente (Agente de Fila já faz)",
+    "responsavel": "Operações",
+    "prazo": "hoje"
+   },
+   {
+    "acao": "Revisar e atualizar regras de validação de exceções",
+    "responsavel": "TI",
+    "prazo": "1 semana"
+   }
+  ],
+  "pedidos_afetados": "Reabrir ou consolidar as exceções duplicadas, mantendo apenas a mais recente ou a mais relevante.",
+  "como_medir": "Redução de 100% nas exceções duplicadas registradas nos relatórios mensais.",
+  "modelo": "openai/gpt-oss-20b",
+  "simulado": false,
+  "gerado_em": "2026-11-14T14:15:48.949Z"
+ },
+ "fila_velha": {
+  "causa": "fila_velha",
+  "titulo": "Fila de Exceções Envelhecida e Pagamentos Pendentes",
+  "severidade": "alta",
+  "resumo_executivo": "Há 692 exceções abertas há mais de 20 dias úteis, com pagamentos pendentes cuja mediana é de 31 dias, indicando expiração de PIX e boleto. A gestão por ordem de chegada está consumindo a capacidade da equipe em casos onde o dano financeiro já ocorreu.",
+  "o_que_acontece": "A fila de exceções opera sem priorização por impacto financeiro ou automação, resultando em um acúmulo de casos antigos. Isso faz com que a equipe gaste tempo em pedidos cuja janela de pagamento já expirou, enquanto casos novos e críticos aguardam atendimento.",
+  "evidencias": [
+   "692 exceções abertas há mais de 20 dias úteis (cerca de 1 mês).",
+   "Pagamento pendente: mediana de 31 dias desde o pedido — pix e boleto já expiraram.",
+   "Tratar por ordem de chegada gasta a capacidade em casos cujo dano já aconteceu."
+  ],
+  "causa_raiz": "A fila é tratada por ordem de chegada, sem prioridade nem automação dos casos simples.",
+  "impacto": "Custo financeiro estimado em R$ 0 (dados não fornecidos) e horas do time em R$ 0 (dados não fornecidos), porém com perda de capacidade operacional significativa devido ao tratamento ineficiente de 692 casos antigos.",
+  "acoes": [
+   {
+    "acao": "Implementar priorização da fila por valor em risco",
+    "responsavel": "Liderança de Operações",
+    "prazo": "hoje"
+   },
+   {
+    "acao": "Configurar cancelamento automático de pedidos não pagos após 7 dias e liberação de estoque",
+    "responsavel": "Liderança de Operações",
+    "prazo": "48h"
+   },
+   {
+    "acao": "Automatizar o tratamento de casos de regra simples utilizando o Agente de Fila",
+    "responsavel": "Liderança de Operações",
+    "prazo": "1 semana"
+   }
+  ],
+  "pedidos_afetados": "Priorizar imediatamente os 692 pedidos abertos por valor em risco; cancelar automaticamente aqueles com pagamento expirado (mediana de 31 dias) para liberar estoque e limpar a fila.",
+  "como_medir": "Redução do tempo médio de abertura das exceções para menos de 5 dias úteis e aumento da taxa de resolução automática de casos simples.",
+  "modelo": "qwen/qwen3.8-27b",
+  "simulado": false,
+  "gerado_em": "2026-11-14T14:15:59.129Z"
+ }
+}

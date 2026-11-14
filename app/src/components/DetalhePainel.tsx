@@ -4,6 +4,7 @@ import Link from "next/link";
 import { X, Crown, Sparkles, AlertTriangle, Factory, Play } from "lucide-react";
 import type { Excecao } from "@/lib/data";
 import { reais, reaisC, data, NIVEL } from "@/lib/format";
+import CelularAgente from "./CelularAgente";
 
 type Detalhe = Excecao & { causas_titulos: { id: string; titulo: string }[] };
 
@@ -34,15 +35,16 @@ function Bloco({ titulo, children }: { titulo: string; children: React.ReactNode
 
 export default function DetalhePainel({ id, onFechar }: { id: string; onFechar: () => void }) {
   const [e, setE] = useState<Detalhe | null>(null);
+  const [agente, setAgente] = useState(0);   // muda a cada execução para reiniciar o painel
   useEffect(() => {
     setE(null);
     fetch(`/api/excecao/${id}`).then((r) => r.json()).then(setE);
   }, [id]);
   useEffect(() => {
-    const esc = (ev: KeyboardEvent) => ev.key === "Escape" && onFechar();
+    const esc = (ev: KeyboardEvent) => ev.key === "Escape" && (agente ? setAgente(0) : onFechar());
     window.addEventListener("keydown", esc);
     return () => window.removeEventListener("keydown", esc);
-  }, [onFechar]);
+  }, [onFechar, agente]);
 
   const comps = e ? COMPONENTES.filter((c) => e.comp[c.k] > 0.005) : [];
   const maxComp = e ? Math.max(...comps.map((c) => e.comp[c.k]), 1) : 1;
@@ -72,7 +74,7 @@ export default function DetalhePainel({ id, onFechar }: { id: string; onFechar: 
               </div>
               <div className="mt-3 font-medium">{e.acao_texto}</div>
               <div className="mt-1 text-sm text-ink-2">{e.motivo_nivel}.</div>
-              <button disabled className="btn btn-primary mt-4 w-full justify-center opacity-50" title="Disponível na próxima etapa">
+              <button onClick={() => setAgente(Date.now())} className="btn btn-primary mt-4 w-full justify-center">
                 <Play size={15} /> Rodar agente agora
               </button>
             </section>
@@ -151,6 +153,7 @@ export default function DetalhePainel({ id, onFechar }: { id: string; onFechar: 
           </>
         )}
       </aside>
+      {agente > 0 && <CelularAgente key={agente} id={id} onFechar={() => setAgente(0)} />}
     </div>
   );
 }

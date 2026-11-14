@@ -8,8 +8,8 @@ const ITENS = [
   { href: "/", rotulo: "Visão geral", icone: LayoutDashboard },
   { href: "/fila", rotulo: "Fila do dia", icone: ListOrdered },
   { href: "/processo", rotulo: "Problemas de processo", icone: Factory },
-  { href: "/acoes", rotulo: "Ações do agente", icone: CheckCheck, embreve: true },
-  { href: "/mensagens", rotulo: "Mensagens", icone: MessageSquare, embreve: true },
+  { href: "/acoes", rotulo: "Ações do agente", icone: CheckCheck },
+  { href: "/mensagens", rotulo: "Mensagens", icone: MessageSquare },
 ];
 
 export default function Nav() {
@@ -17,14 +17,13 @@ export default function Nav() {
   const [aberto, setAberto] = useState(false);
   const links = (
     <nav className="flex flex-col gap-1">
-      {ITENS.map(({ href, rotulo, icone: Icone, embreve }) => {
+      {ITENS.map(({ href, rotulo, icone: Icone }) => {
         const ativo = href === "/" ? path === "/" : path.startsWith(href);
         return (
           <Link key={href} href={href} onClick={() => setAberto(false)}
             className={`flex items-center gap-3 rounded-lg px-3 py-2 text-sm transition-colors ${ativo ? "bg-accent-soft text-accent-ink font-medium" : "text-ink-2 hover:bg-surface-2"}`}>
             <Icone size={18} strokeWidth={1.75} />
             <span className="flex-1">{rotulo}</span>
-            {embreve && <span className="text-[10px] uppercase tracking-wide text-muted">em breve</span>}
           </Link>
         );
       })}

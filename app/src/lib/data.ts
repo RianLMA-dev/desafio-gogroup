@@ -48,3 +48,10 @@ export const linhaFila = (e: Excecao): LinhaFila => ({
 });
 
 export const tituloCausa = Object.fromEntries(causas.map((c) => [c.id, c.titulo]));
+
+import loteJson from "@/data/lote_agente.json";
+import relatoriosJson from "@/data/relatorios.json";
+import type { Decisao, Relatorio } from "@/lib/agente/tipos";
+
+export const lote = loteJson as { gerado_em: string | null; modo: "ia" | "simulado" | null; decisoes: (Decisao & { correcoes?: number })[] };
+export const relatorios = relatoriosJson as Record<string, Relatorio>;

@@ -1,5 +1,6 @@
-import { FileText, Eye, Wrench, User } from "lucide-react";
-import { causas, resumo } from "@/lib/data";
+import { Eye, Wrench, User } from "lucide-react";
+import RelatorioIncidente from "@/components/RelatorioIncidente";
+import { causas, resumo, relatorios } from "@/lib/data";
 import { mil, n } from "@/lib/format";
 import { GraficoCausa } from "@/components/Graficos";
 
@@ -63,9 +64,7 @@ export default function ProcessoPage() {
                 </ol>
                 <div className="mt-3 flex items-center gap-2 text-xs text-muted"><User size={13} /> Responsável: {c.responsavel}</div>
               </div>
-              <button disabled className="btn btn-ghost shrink-0 opacity-50" title="Disponível na próxima etapa">
-                <FileText size={15} /> Gerar relatório de incidente
-              </button>
+              <RelatorioIncidente id={c.id} salvo={relatorios[c.id]} />
             </div>
           </article>
         ))}

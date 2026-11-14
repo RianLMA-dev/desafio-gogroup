@@ -1,26 +1,102 @@
-# Central de Exceções — Desafio AI-First Gogroup (Problema 2: Operações)
+# Central de Exceções — Desafio AI-First Gogroup
 
-Solução que prioriza, investiga e ajuda a resolver os pedidos com exceção, com dois agentes de IA.
+**Problema 2 · Operações.** Uma central que prioriza, investiga e ajuda a resolver os pedidos com exceção, com dois agentes de IA trabalhando dentro dela.
 
-> 🚧 Em desenvolvimento. README completo com números, premissas e instruções de deploy na versão final.
+🔗 **Solução publicada:** _(link do Vercel)_
+
+## O resultado em uma frase
+
+> Com priorização por valor em risco e o Agente de Fila, a operação recupera **R$ 32,7 mil** desta fila (95% da perda que dava para evitar) e zera as 2.042 exceções em **5 dias úteis, não 14**, usando **70% menos tempo do time**.
+
+| Estratégia (mesma fila, mesma capacidade de 150/dia) | Perda evitável | Fila zera em |
+|---|---|---|
+| Ordem de chegada (como é hoje) | R$ 34,3 mil | 14 dias úteis |
+| Priorização por valor em risco | R$ 7,7 mil | 14 dias úteis |
+| **Priorização + Agente de Fila** | **R$ 1,5 mil** | **5 dias úteis** |
+
+Além disso, **9 causas na origem** geram exceções que voltam todo dia e custam **≈ R$ 26 mil por mês e 93 horas do time por mês**. O Agente de Processo encontra e documenta cada uma.
+
+## Como funciona
+
+```
+                 ┌──────────────────────────────┐
+ dados do ERP ──▶│  Motor de cálculo (Python)   │  valor em risco de cada exceção,
+                 │  analise/motor.py            │  prioridade, simulação dos cenários,
+                 └──────────────┬───────────────┘  detecção estatística de padrões
+                                │
+          ┌─────────────────────┴─────────────────────┐
+          ▼                                           ▼
+┌───────────────────────┐                 ┌───────────────────────┐
+│    Agente de Fila     │◀── instruções ──│  Agente de Processo   │
+│  investiga cada caso  │   dos incidentes│  escreve relatórios   │
+│  com ferramentas e    │                 │  de incidente para a  │
+│  age (3 níveis)       │                 │  liderança            │
+└───────────────────────┘                 └───────────────────────┘
+```
+
+**Motor de cálculo (código, não IA).** Para cada exceção calcula a perda esperada — cancelamento, custo de reenvio, recompra perdida, contatos no atendimento, venda não recuperada — e quanto ela cresce se o caso esperar mais uma semana. Esse crescimento ordena a fila. Números precisam ser exatos e reproduzíveis, por isso não dependem da IA.
+
+**Agente de Fila (IA com ferramentas).** Para cada exceção, o agente decide quais ferramentas usar — `consultar_pedido`, `consultar_cliente`, `verificar_prazo`, `verificar_incidentes`, `consultar_politica` — e registra uma ação com mensagem ao cliente, chamado para a transportadora e nota para o time. Trabalha em três níveis:
+
+| Nível | O que é | Exemplos | Casos na fila |
+|---|---|---|---|
+| Resolve sozinho | ações sem custo | avisar data correta, abrir chamado, lembrete de pagamento, fechar duplicado | 854 |
+| Aprovação em 1 clique | ações com custo | reenvio, nova produção | 681 |
+| Pessoa | fora da política | pedido > R$ 200, cliente VIP, 3+ contatos, extravio, ruptura | 507 |
+
+**Guardrails:** a política é verificada em código. Se o agente tentar uma ação fora da política (por exemplo, resolver sozinho um pedido de cliente VIP), o sistema recusa e explica o motivo, e o agente se corrige.
+
+**Agente de Processo (IA).** Recebe a evidência estatística de cada padrão anormal e escreve um relatório de incidente: o que acontece, causa raiz, impacto em R$, plano de ação com responsável e prazo, e como medir se resolveu. As instruções dos incidentes alimentam o Agente de Fila (ex.: "reenvie de outro lote, nunca do L2607-B").
+
+**Lote + ao vivo.** Como em produção, os agentes processam a fila em lote (`npm run agente:lote`) e o resultado aparece nas telas *Ações do agente* e *Mensagens*. Em qualquer pedido ou incidente, o botão **Rodar agente agora** executa o agente ao vivo. As ações são simuladas: em produção seriam integrações com WhatsApp, transportadoras e ERP.
+
+## Causas-raiz encontradas
+
+| Causa | Tipo | Custo/mês |
+|---|---|---|
+| Separação de kits com brinde no CD2, turno da noite | Processo | R$ 7,7 mil |
+| Rota Express atrasando no Nordeste (piorou desde 31/08) | Transportadora | R$ 5,3 mil |
+| Carga Norte danificando produtos frágeis | Transportadora | R$ 4,5 mil |
+| Lote L2607-B do Condicionador Ápice 1000ml com defeito | Fornecedor | R$ 3,2 mil |
+| Impressora IMP-02 com defeito (desde 24/08) | Produção | R$ 2,9 mil |
+| Prazo prometido calculado em dias corridos (30% dos "atrasos" não são atrasos) | Sistema | R$ 1,5 mil + 15 h/mês |
+| Site vendendo produtos Kokeshi sem estoque | Estoque | R$ 1,0 mil |
+| Exceções registradas em duplicidade | Sistema | 4 h/mês |
+| Fila envelhecida e pagamentos esquecidos | Gestão | — |
+
+Critério: concentração muito acima do normal, estatisticamente significativa (com correção para comparações múltiplas), com mecanismo operacional plausível e acionável. Endereço divergente, devolução, pagamento pendente e extravio **não** têm causa na origem — os sinais que apareceram eram efeito de composição ou acaso — e são tratados caso a caso.
+
+## Premissas
+
+As regras que não estão nos parâmetros do negócio estão listadas no app (Visão geral → Premissas) e em `analise/motor.py`. As principais: o cliente cancela com base na data que foi prometida a ele; quando a exceção é tratada o risco para de crescer; uma exceção vira "mal resolvida" gradualmente entre 2 e 10 dias úteis de espera; o limite do agente é R$ 200 (≈ 2× o ticket médio — testamos de R$ 100 a sem limite e acima disso o ganho é mínimo).
 
 ## Estrutura
 
 ```
-analise/   Motor de cálculo em Python (valor em risco, simulação dos cenários, causas-raiz)
+analise/   Motor de cálculo e análises em Python (pandas, numpy, scipy)
 dados/     Dados do desafio (sintéticos)
-app/       Site em Next.js (o que vai para o Vercel)
+app/       Site Next.js 15 + Tailwind + Recharts, agentes via API do Groq
 ```
 
 ## Rodar localmente
 
 ```bash
-# 1. (opcional) regenerar os dados do app
+# 1. (opcional) regenerar os números do motor
 pip install pandas numpy scipy
 python analise/exportar.py
 
-# 2. rodar o site
+# 2. site
 cd app
 npm install
-npm run dev        # abre em http://localhost:3000
+echo GROQ_API_KEY=sua-chave > .env.local    # chave grátis em console.groq.com
+npm run dev                                  # http://localhost:3000
+
+# 3. (opcional) reprocessar o lote dos agentes, com o site rodando
+npm run agente:lote -- --por-nivel 10
 ```
+
+Sem chave, os agentes rodam em **modo simulado** (mesma investigação e política, mensagens de modelo). Se o limite gratuito do Groq for atingido, o app tenta outros modelos e, em último caso, mostra a decisão pela política com um aviso.
+
+## Ferramentas
+
+Construído com **Claude Code** (análise, motor, app e agentes). IA dos agentes: modelos abertos via **Groq** (`openai/gpt-oss-120b`, `qwen/qwen3.8-27b`, `openai/gpt-oss-20b`).

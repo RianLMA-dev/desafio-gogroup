@@ -247,7 +247,7 @@ def main():
             tipo=r.tipo_excecao, tipo_rotulo=ROTULOS[r.tipo_excecao], status=r.status,
             transportadora=r.transportadora, uf=r.uf, cidade=r.cidade, cd=r.cd, turno=r.turno,
             maquina=None if pd.isna(r.maquina) else r.maquina, lote=r.lote_produto,
-            data_pedido=r.data_pedido, data_prometida=r.data_prometida, prazo_correto=str(r.prazo_correto),
+            data_pedido=r.data_pedido, data_prometida=r.data_prometida, prazo_correto=str(r.prazo_correto)[:10],
             data_entrega=None if pd.isna(r.data_entrega) else r.data_entrega, data_abertura=r.data_abertura_excecao,
             atraso_prometido=int(r.atraso_vs_prometido), atraso_real=int(r.atraso_vs_correto), falso_atraso=bool(r.falso_atraso),
             dias_aberta=int(r.dias_aberta), duplicado=bool(r.duplicado),
