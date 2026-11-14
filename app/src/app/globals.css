@@ -1,0 +1,71 @@
+@import "tailwindcss";
+
+:root {
+  color-scheme: light;
+  --page: #f6f6f3;
+  --surface: #ffffff;
+  --surface-2: #f9f9f7;
+  --ink: #0b0b0b;
+  --ink-2: #52514e;
+  --muted: #898781;
+  --line: #e7e6e0;
+  --line-strong: #c3c2b7;
+  --grid: #ecebe5;
+
+  --accent: #2a78d6;
+  --accent-soft: #e8f1fc;
+  --accent-ink: #1c5cab;
+
+  /* categóricas (ordem fixa): cenários */
+  --s1: #898781;   /* ordem de chegada — neutro (situação atual) */
+  --s2: #eb6834;   /* priorização */
+  --s3: #2a78d6;   /* priorização + agente */
+
+  /* status */
+  --good: #0ca30c;
+  --good-ink: #006300;
+  --good-soft: #e7f6e7;
+  --warning: #fab219;
+  --serious: #ec835a;
+  --serious-ink: #b5461b;
+  --serious-soft: #fdeee7;
+  --critical: #d03b3b;
+  --critical-soft: #fbeaea;
+}
+
+@theme inline {
+  --color-page: var(--page);
+  --color-surface: var(--surface);
+  --color-surface-2: var(--surface-2);
+  --color-ink: var(--ink);
+  --color-ink-2: var(--ink-2);
+  --color-muted: var(--muted);
+  --color-line: var(--line);
+  --color-accent: var(--accent);
+  --color-accent-soft: var(--accent-soft);
+  --color-accent-ink: var(--accent-ink);
+  --color-good: var(--good);
+  --color-good-ink: var(--good-ink);
+  --color-good-soft: var(--good-soft);
+  --color-serious: var(--serious);
+  --color-serious-ink: var(--serious-ink);
+  --color-serious-soft: var(--serious-soft);
+  --color-critical: var(--critical);
+  --color-critical-soft: var(--critical-soft);
+  --font-sans: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+}
+
+html, body { background: var(--page); color: var(--ink); }
+body { font-family: var(--font-sans); -webkit-font-smoothing: antialiased; }
+.tabular { font-variant-numeric: tabular-nums; }
+
+.card { background: var(--surface); border: 1px solid var(--line); border-radius: 12px; }
+.chip { display: inline-flex; align-items: center; gap: 6px; border-radius: 999px; padding: 2px 10px; font-size: 12px; font-weight: 500; white-space: nowrap; }
+.btn { display: inline-flex; align-items: center; gap: 8px; border-radius: 8px; padding: 8px 14px; font-size: 14px; font-weight: 500; transition: background .15s; }
+.btn-primary { background: var(--accent); color: #fff; }
+.btn-primary:hover { background: var(--accent-ink); }
+.btn-ghost { border: 1px solid var(--line); background: var(--surface); }
+.btn-ghost:hover { background: var(--surface-2); }
+
+@keyframes slide-in { from { transform: translateX(100%); } to { transform: translateX(0); } }
+.slide-in { animation: slide-in .25s ease-out; }

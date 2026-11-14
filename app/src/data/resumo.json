@@ -1,0 +1,325 @@
+{
+ "data_referencia": "2026-09-30",
+ "n_excecoes": 2042,
+ "n_duplicadas": 42,
+ "valor_pedidos": 224118.64,
+ "perda_piso": 126271.65,
+ "perda_sem_tratar_20d": 170677.07,
+ "cenarios": {
+  "fifo": {
+   "perda": 160548.88,
+   "evitavel": 34277.23,
+   "dias_para_zerar": 14
+  },
+  "prioridade": {
+   "perda": 133969.39,
+   "evitavel": 7697.74,
+   "dias_para_zerar": 14
+  },
+  "agente": {
+   "perda": 127811.65,
+   "evitavel": 1540.0,
+   "dias_para_zerar": 5
+  }
+ },
+ "economia_prioridade": 26579.49,
+ "economia_agente": 32737.23,
+ "niveis": {
+  "auto": 854,
+  "aprovacao": 681,
+  "humano": 507
+ },
+ "minutos_time_agente": 7446,
+ "minutos_time_hoje": 24504,
+ "top150_espera_fifo": 10.48,
+ "componentes_piso": {
+  "cancel": 51857.95,
+  "resolucao": 24456.01,
+  "recompra": 19612.94,
+  "contatos": 20640.6,
+  "venda": 9704.14
+ },
+ "por_tipo": [
+  {
+   "tipo": "atraso_entrega",
+   "rotulo": "Atraso na entrega",
+   "n": 510,
+   "valor": 54427.05,
+   "perda_hoje": 10108.5,
+   "score_medio": 11.4,
+   "auto": 469,
+   "aprovacao": 0,
+   "humano": 41
+  },
+  {
+   "tipo": "avaria_transporte",
+   "rotulo": "Avaria no transporte",
+   "n": 192,
+   "valor": 26068.24,
+   "perda_hoje": 18339.97,
+   "score_medio": 11.53,
+   "auto": 6,
+   "aprovacao": 133,
+   "humano": 53
+  },
+  {
+   "tipo": "devolvido_transportadora",
+   "rotulo": "Devolvido pela transportadora",
+   "n": 183,
+   "valor": 20028.7,
+   "perda_hoje": 12859.17,
+   "score_medio": 10.86,
+   "auto": 1,
+   "aprovacao": 135,
+   "humano": 47
+  },
+  {
+   "tipo": "endereco_divergente",
+   "rotulo": "Endereço divergente",
+   "n": 127,
+   "valor": 12730.0,
+   "perda_hoje": 7870.21,
+   "score_medio": 8.56,
+   "auto": 105,
+   "aprovacao": 0,
+   "humano": 22
+  },
+  {
+   "tipo": "extravio",
+   "rotulo": "Extravio",
+   "n": 60,
+   "valor": 6201.86,
+   "perda_hoje": 4478.35,
+   "score_medio": 11.71,
+   "auto": 0,
+   "aprovacao": 0,
+   "humano": 60
+  },
+  {
+   "tipo": "falha_personalizacao",
+   "rotulo": "Falha de personalização",
+   "n": 130,
+   "valor": 17037.57,
+   "perda_hoje": 13727.81,
+   "score_medio": 8.61,
+   "auto": 0,
+   "aprovacao": 107,
+   "humano": 23
+  },
+  {
+   "tipo": "item_faltante",
+   "rotulo": "Item faltante",
+   "n": 285,
+   "valor": 30147.19,
+   "perda_hoje": 21816.57,
+   "score_medio": 9.32,
+   "auto": 7,
+   "aprovacao": 220,
+   "humano": 58
+  },
+  {
+   "tipo": "pagamento_pendente",
+   "rotulo": "Pagamento pendente",
+   "n": 142,
+   "valor": 13606.34,
+   "perda_hoje": 9704.14,
+   "score_medio": 1.6,
+   "auto": 118,
+   "aprovacao": 0,
+   "humano": 24
+  },
+  {
+   "tipo": "rastreio_parado",
+   "rotulo": "Rastreio parado",
+   "n": 177,
+   "valor": 19719.25,
+   "perda_hoje": 10448.46,
+   "score_medio": 10.02,
+   "auto": 144,
+   "aprovacao": 0,
+   "humano": 33
+  },
+  {
+   "tipo": "ruptura_pos_venda",
+   "rotulo": "Ruptura pós-venda",
+   "n": 123,
+   "valor": 12141.16,
+   "perda_hoje": 7957.9,
+   "score_medio": 8.71,
+   "auto": 2,
+   "aprovacao": 0,
+   "humano": 121
+  },
+  {
+   "tipo": "vazamento_produto",
+   "rotulo": "Vazamento",
+   "n": 113,
+   "valor": 12011.28,
+   "perda_hoje": 8960.56,
+   "score_medio": 11.33,
+   "auto": 2,
+   "aprovacao": 86,
+   "humano": 25
+  }
+ ],
+ "curvas": [
+  {
+   "dia": 0,
+   "restante_fifo": 2042,
+   "restante_prioridade": 2042,
+   "restante_agente": 2042
+  },
+  {
+   "dia": 1,
+   "restante_fifo": 1892,
+   "restante_prioridade": 1892,
+   "restante_agente": 955
+  },
+  {
+   "dia": 2,
+   "restante_fifo": 1742,
+   "restante_prioridade": 1742,
+   "restante_agente": 648
+  },
+  {
+   "dia": 3,
+   "restante_fifo": 1592,
+   "restante_prioridade": 1592,
+   "restante_agente": 303
+  },
+  {
+   "dia": 4,
+   "restante_fifo": 1442,
+   "restante_prioridade": 1442,
+   "restante_agente": 33
+  },
+  {
+   "dia": 5,
+   "restante_fifo": 1292,
+   "restante_prioridade": 1292,
+   "restante_agente": 0
+  },
+  {
+   "dia": 6,
+   "restante_fifo": 1142,
+   "restante_prioridade": 1142,
+   "restante_agente": 0
+  },
+  {
+   "dia": 7,
+   "restante_fifo": 992,
+   "restante_prioridade": 992,
+   "restante_agente": 0
+  },
+  {
+   "dia": 8,
+   "restante_fifo": 842,
+   "restante_prioridade": 842,
+   "restante_agente": 0
+  },
+  {
+   "dia": 9,
+   "restante_fifo": 692,
+   "restante_prioridade": 692,
+   "restante_agente": 0
+  },
+  {
+   "dia": 10,
+   "restante_fifo": 542,
+   "restante_prioridade": 542,
+   "restante_agente": 0
+  },
+  {
+   "dia": 11,
+   "restante_fifo": 392,
+   "restante_prioridade": 392,
+   "restante_agente": 0
+  },
+  {
+   "dia": 12,
+   "restante_fifo": 242,
+   "restante_prioridade": 242,
+   "restante_agente": 0
+  },
+  {
+   "dia": 13,
+   "restante_fifo": 92,
+   "restante_prioridade": 92,
+   "restante_agente": 0
+  },
+  {
+   "dia": 14,
+   "restante_fifo": 0,
+   "restante_prioridade": 0,
+   "restante_agente": 0
+  }
+ ],
+ "causas_custo_mensal": 26216.41,
+ "causas_horas_mes": 92.79,
+ "premissas": [
+  {
+   "id": "dias_uteis",
+   "texto": "O time trabalha em dias úteis (seg–sex, sem feriados) e trata 150 exceções por dia útil, como diz parametros.md."
+  },
+  {
+   "id": "congela",
+   "texto": "Quando uma exceção é tratada (cliente recebe solução ou nova data), o risco para de crescer: a chance de cancelamento e o dano à recompra ficam no nível do dia do tratamento."
+  },
+  {
+   "id": "atraso_cliente",
+   "texto": "O cliente cancela com base na data que foi prometida a ele (data_prometida), mesmo que essa data esteja errada. Por isso o bug da promessa gera cancelamentos reais."
+  },
+  {
+   "id": "pos_entrega",
+   "texto": "Em problemas depois da entrega (avaria, vazamento, item faltante) e em problemas sem data de entrega (ruptura, falha de personalização, devolução, endereço), a tabela de cancelamento é aplicada aos dias úteis de espera desde a abertura da exceção."
+  },
+  {
+   "id": "reembolso",
+   "texto": "Se o cliente cancela, a empresa devolve o valor pago (custo de reembolso = valor do pedido) e não paga o reenvio."
+  },
+  {
+   "id": "reenvio_item",
+   "texto": "Item faltante reenvia só o item: CMV proporcional (valor × 24% ÷ nº de itens) + frete da transportadora."
+  },
+  {
+   "id": "devolvido",
+   "texto": "Pedido devolvido pela transportadora: o produto volta ao CD, então o custo de reenvio é só um novo frete."
+  },
+  {
+   "id": "mal_resolvida",
+   "texto": "Uma exceção é considerada mal resolvida de forma gradual: 0% se tratada em até 2 dias úteis de espera, subindo linearmente até 100% com 10 dias úteis."
+  },
+  {
+   "id": "recompra",
+   "texto": "O valor de uma recompra é o ticket médio do cliente (receita acumulada ÷ nº de pedidos) × margem bruta de 76% (100% − CMV). Consideramos uma recompra em 12 meses."
+  },
+  {
+   "id": "contatos",
+   "texto": "Enquanto espera sem solução, o cliente procura o atendimento 1 vez a cada 10 dias úteis, no máximo 3 vezes (R$ 9,00 por contato)."
+  },
+  {
+   "id": "pagamento",
+   "texto": "Pagamento pendente: chance de recuperar a venda com um lembrete cai com a idade do pedido — 50% até 3 dias, 25% até 7, 10% até 15 e 3% depois disso. A perda é a margem da venda não recuperada."
+  },
+  {
+   "id": "atraso_entregue",
+   "texto": "Atraso já entregue: não há mais risco de cancelamento. Resta só comunicar o cliente e encerrar."
+  },
+  {
+   "id": "duplicados",
+   "texto": "Exceções com o mesmo pedido e o mesmo tipo registradas duas vezes são duplicadas: a segunda é fechada sem custo."
+  },
+  {
+   "id": "agente_regras",
+   "texto": "O Agente de Fila só resolve sozinho pedidos até R$ 200 (cerca de 2× o ticket médio de R$ 110; testamos de R$ 100 a sem limite e acima de R$ 200 o ganho é mínimo), de clientes que não são VIP (receita < R$ 1.500) e com menos de 3 contatos no atendimento. Extravio e ruptura sempre vão para uma pessoa (decisão de reembolso/troca)."
+  },
+  {
+   "id": "agente_niveis",
+   "texto": "O agente trabalha em 3 níveis: (1) resolve sozinho ações só de comunicação ou sistema (fechar duplicado, avisar cliente, abrir chamado na transportadora, lembrete ou cancelamento de pagamento, pedir confirmação de endereço) — 0 min do time; (2) prepara ações que geram custo (reenvio, nova produção) e uma pessoa aprova em 1 clique — 2 min; (3) casos fora da política vão para uma pessoa — 12 min, como hoje."
+  },
+  {
+   "id": "agente_capacidade",
+   "texto": "O time tem 150 × 12 = 1.800 minutos por dia útil. No cenário com agente, esse tempo é gasto em ordem de prioridade: aprovações (2 min) e casos humanos (12 min)."
+  }
+ ]
+}
