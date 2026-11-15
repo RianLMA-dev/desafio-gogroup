@@ -1,7 +1,7 @@
 import "server-only";
 import { lote, type Excecao } from "@/lib/data";
 import { chat, temChave, type Msg, SemModeloDisponivel } from "./groq";
-import { ACOES, FERRAMENTAS, TOOLS_SCHEMA, validarAcao, foraDaPolitica, verificarPrazo } from "./ferramentas";
+import { ACOES, FERRAMENTAS, TOOLS_SCHEMA, validarAcao, foraDaPolitica, verificarPrazo, achado } from "./ferramentas";
 
 import type { Evento, Decisao } from "./tipos";
 export type { Evento, Decisao };
@@ -25,6 +25,7 @@ Regras de texto:
 - Reenvio por avaria, vazamento ou item faltante: peça a foto ao cliente.
 - mensagem_transportadora: só quando a ação envolve a transportadora; cite pedido, destino, prazo contratado e peça nova previsão em 24h.`;
 
+const detalhe = (nome: string, e: Excecao) => { const a = achado(nome, e); return { achado: a.texto, instrucao: a.instrucao }; };
 const dm = (iso: string | null) => (iso ? `${iso.slice(8, 10)}/${iso.slice(5, 7)}` : "");
 
 function base(e: Excecao, modelo: string, simulado: boolean, passos: string[]) {
@@ -55,7 +56,7 @@ async function* doLote(e: Excecao): AsyncGenerator<Evento> {
   if (!d) return;
   for (const nome of d.passos) {
     const f = FERRAMENTAS[nome];
-    if (f) yield { tipo: "ferramenta", nome, rotulo: f.rotulo, resultado: f.fn(e) };
+    if (f) yield { tipo: "ferramenta", nome, rotulo: f.rotulo, resultado: f.fn(e), ...detalhe(nome, e) };
   }
   yield { tipo: "acao", resultado: d };
 }
@@ -92,6 +93,9 @@ async function* rodarSemCache(e: Excecao): AsyncGenerator<Evento> {
             continue;
           }
           const a = ACOES[args.acao];
+          // modelos às vezes escrevem "\n" literal: vira quebra de linha de verdade
+          for (const k of ["justificativa", "mensagem_cliente", "mensagem_transportadora", "nota_interna"])
+            if (typeof args[k] === "string") args[k] = args[k].replace(/\\n/g, "\n").trim();
           yield {
             tipo: "acao",
             resultado: {
@@ -105,7 +109,7 @@ async function* rodarSemCache(e: Excecao): AsyncGenerator<Evento> {
         const f = FERRAMENTAS[nome];
         const resultado = f ? f.fn(e) : { erro: `ferramenta ${nome} não existe` };
         if (f) passos.push(nome);
-        yield { tipo: "ferramenta", nome, rotulo: f?.rotulo ?? nome, resultado };
+        yield { tipo: "ferramenta", nome, rotulo: f?.rotulo ?? nome, resultado, ...(f ? detalhe(nome, e) : {}) };
         msgs.push({ role: "tool", tool_call_id: tc.id, content: JSON.stringify(resultado) });
       }
     }
@@ -135,7 +139,7 @@ export async function* simularAgenteFila(e: Excecao, semInicio = false): AsyncGe
   for (const nome of ["consultar_pedido", "verificar_prazo", "consultar_cliente", "verificar_incidentes", "consultar_politica"]) {
     const f = FERRAMENTAS[nome];
     passos.push(nome);
-    yield { tipo: "ferramenta", nome, rotulo: f.rotulo, resultado: f.fn(e) };
+    yield { tipo: "ferramenta", nome, rotulo: f.rotulo, resultado: f.fn(e), ...detalhe(nome, e) };
   }
   yield { tipo: "acao", resultado: decisaoPorPolitica(e, passos) };
 }

@@ -108,6 +108,35 @@ export function consultarPolitica(e: Excecao) {
   };
 }
 
+const brl = (v: number) => `R$ ${v.toLocaleString("pt-BR", { maximumFractionDigits: 0 })}`;
+const dm = (iso: string | null) => (iso ? `${iso.slice(8, 10)}/${iso.slice(5, 7)}` : "");
+
+/** Resumo legível do que cada ferramenta encontrou (mostrado na tela, abaixo do passo). */
+export function achado(nome: string, e: Excecao): { texto: string; instrucao?: string } {
+  switch (nome) {
+    case "consultar_pedido":
+      return { texto: `${e.produto} · ${brl(e.valor)}${e.itens > 1 ? ` · ${e.itens} itens` : ""}${e.brinde ? " + brinde" : ""} · ${e.transportadora} para ${e.cidade}/${e.uf}${e.duplicado ? " · exceção DUPLICADA" : ""}` };
+    case "consultar_cliente":
+      return { texto: `${e.vip ? "Cliente VIP · " : ""}${e.cli_pedidos} ${e.cli_pedidos === 1 ? "pedido" : "pedidos"} · ${brl(e.cli_receita)} em compras · ${e.cli_contatos} ${e.cli_contatos === 1 ? "contato" : "contatos"} no atendimento` };
+    case "verificar_prazo": {
+      if (e.falso_atraso) return { texto: `Prometido ${dm(e.data_prometida)}, mas o prazo correto é ${dm(e.prazo_correto)}: não está atrasado de verdade` };
+      if (e.data_entrega) return { texto: `Entregue em ${dm(e.data_entrega)} · prometido para ${dm(e.data_prometida)}` };
+      if (e.atraso_prometido > 0) return { texto: `${Math.max(0, e.atraso_real)} dias úteis de atraso real · cliente percebe ${e.atraso_prometido} · SLA ${e.sla} dias` };
+      return { texto: `Dentro do prazo · prometido para ${dm(e.data_prometida)}` };
+    }
+    case "verificar_incidentes": {
+      const ligadas = causas.filter((c) => e.causas.includes(c.id));
+      if (!ligadas.length) return { texto: "Caso isolado: nenhum problema de processo conhecido" };
+      return { texto: `Faz parte de: ${ligadas.map((c) => c.titulo).join(" · ")}`, instrucao: ligadas.map((c) => INSTRUCOES[c.id]).filter(Boolean).join(" ") };
+    }
+    case "consultar_politica": {
+      const fora = foraDaPolitica(e);
+      return { texto: fora ? `Fora da política do agente: ${fora}` : "Dentro da política: o agente pode agir" };
+    }
+  }
+  return { texto: "" };
+}
+
 export const FERRAMENTAS: Record<string, { rotulo: string; fn: (e: Excecao) => unknown }> = {
   consultar_pedido: { rotulo: "Consultando o pedido", fn: consultarPedido },
   consultar_cliente: { rotulo: "Consultando histórico do cliente", fn: consultarCliente },

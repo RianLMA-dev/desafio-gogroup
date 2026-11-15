@@ -48,6 +48,8 @@ Além disso, **9 causas na origem** geram exceções que voltam todo dia e custa
 
 **Agente de Processo (IA).** Recebe a evidência estatística de cada padrão anormal e escreve um relatório de incidente: o que acontece, causa raiz, impacto em R$, plano de ação com responsável e prazo, e como medir se resolveu. As instruções dos incidentes alimentam o Agente de Fila (ex.: "reenvie de outro lote, nunca do L2607-B").
 
+**Demonstração.** Ao rodar o agente num pedido, cada passo mostra o que ele descobriu (cliente VIP, atraso real, problema de processo ligado — com a instrução do Agente de Processo em destaque) e a mensagem aparece sendo digitada num celular. Depois de enviada, dá para **simular a resposta do cliente**: a IA interpreta o cliente (manda a foto, pede reembolso, cobra prazo) e o agente reage dentro da política. Na Fila do dia, o **piloto automático** deixa o agente tratar ao vivo os próximos 10 casos dele, com contadores de mensagens, chamados e risco evitado. Em *Problemas de processo*, um mapa mostra em que etapa do caminho do pedido cada causa nasce.
+
 **Lote + ao vivo.** Como em produção, os agentes processam a fila em lote (`npm run agente:lote`) e o resultado aparece nas telas *Ações do agente* e *Mensagens*. Em qualquer pedido ou incidente, o botão **Rodar agente agora** executa o agente ao vivo. As ações são simuladas: em produção seriam integrações com WhatsApp, transportadoras e ERP.
 
 ## Causas-raiz encontradas

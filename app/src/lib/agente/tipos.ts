@@ -8,7 +8,7 @@ export interface Decisao {
 
 export type Evento =
   | { tipo: "inicio"; id: string; pedido: string; modo: "ia" | "simulado" }
-  | { tipo: "ferramenta"; nome: string; rotulo: string; resultado: unknown }
+  | { tipo: "ferramenta"; nome: string; rotulo: string; resultado: unknown; achado?: string; instrucao?: string }
   | { tipo: "correcao"; texto: string }
   | { tipo: "acao"; resultado: Decisao }
   | { tipo: "erro"; texto: string };

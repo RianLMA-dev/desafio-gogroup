@@ -1,5 +1,6 @@
 import { Eye, Wrench, User } from "lucide-react";
 import RelatorioIncidente from "@/components/RelatorioIncidente";
+import MapaCausas from "@/components/MapaCausas";
 import { causas, resumo, relatorios } from "@/lib/data";
 import { mil, n } from "@/lib/format";
 import { GraficoCausa } from "@/components/Graficos";
@@ -22,6 +23,8 @@ export default function ProcessoPage() {
           O custo considera só o excesso acima do normal, já descontado o que aconteceria de qualquer forma.
         </p>
       </section>
+
+      <MapaCausas causas={causas} />
 
       <div className="flex flex-col gap-4">
         {ativas.map((c) => (
