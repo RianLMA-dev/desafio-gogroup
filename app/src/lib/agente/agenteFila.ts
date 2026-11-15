@@ -1,5 +1,5 @@
 import "server-only";
-import type { Excecao } from "@/lib/data";
+import { lote, type Excecao } from "@/lib/data";
 import { chat, temChave, type Msg, SemModeloDisponivel } from "./groq";
 import { ACOES, FERRAMENTAS, TOOLS_SCHEMA, validarAcao, foraDaPolitica, verificarPrazo } from "./ferramentas";
 
@@ -34,8 +34,33 @@ function base(e: Excecao, modelo: string, simulado: boolean, passos: string[]) {
   };
 }
 
+// Cache curto em memória: se o mesmo pedido for rodado de novo em poucos minutos
+// (vários avaliadores clicando no mesmo caso), reaproveita o resultado e poupa o limite do Groq.
+const CACHE = new Map<string, { quando: number; eventos: Evento[] }>();
+const CACHE_MS = 10 * 60 * 1000;
+
 /** Executa o agente com IA (Groq + ferramentas). Emite eventos à medida que trabalha. */
 export async function* rodarAgenteFila(e: Excecao): AsyncGenerator<Evento> {
+  const c = CACHE.get(e.id);
+  if (c && Date.now() - c.quando < CACHE_MS) { yield* c.eventos; return; }
+  const eventos: Evento[] = [];
+  for await (const ev of rodarSemCache(e)) { eventos.push(ev); yield ev; }
+  const final = eventos.find((x) => x.tipo === "acao");
+  if (final && final.tipo === "acao" && !final.resultado.simulado) CACHE.set(e.id, { quando: Date.now(), eventos });
+}
+
+/** Plano B quando a IA está no limite: decisão já processada pela IA no lote, se existir. */
+async function* doLote(e: Excecao): AsyncGenerator<Evento> {
+  const d = lote.decisoes.find((x) => x.id === e.id && !x.simulado);
+  if (!d) return;
+  for (const nome of d.passos) {
+    const f = FERRAMENTAS[nome];
+    if (f) yield { tipo: "ferramenta", nome, rotulo: f.rotulo, resultado: f.fn(e) };
+  }
+  yield { tipo: "acao", resultado: d };
+}
+
+async function* rodarSemCache(e: Excecao): AsyncGenerator<Evento> {
   if (!temChave()) { yield* simularAgenteFila(e); return; }
   yield { tipo: "inicio", id: e.id, pedido: e.pedido, modo: "ia" };
 
@@ -87,7 +112,12 @@ export async function* rodarAgenteFila(e: Excecao): AsyncGenerator<Evento> {
     yield { tipo: "erro", texto: "O agente não finalizou a tempo." };
   } catch (err) {
     if (err instanceof SemModeloDisponivel) {
-      yield { tipo: "erro", texto: "Limite de uso da IA atingido no momento. Mostrando a decisão simulada pela política." };
+      if (lote.decisoes.some((x) => x.id === e.id && !x.simulado)) {
+        yield { tipo: "erro", texto: "Limite de uso gratuito da IA atingido agora. Mostrando a decisão que a IA tomou para este caso no processamento em lote." };
+        yield* doLote(e);
+        return;
+      }
+      yield { tipo: "erro", texto: "Limite de uso gratuito da IA atingido agora. Mostrando a decisão pela política, sem IA. Tente de novo em 1 minuto." };
       yield* simularAgenteFila(e, true);
       return;
     }

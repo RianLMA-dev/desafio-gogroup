@@ -66,6 +66,22 @@ Além disso, **9 causas na origem** geram exceções que voltam todo dia e custa
 
 Critério: concentração muito acima do normal, estatisticamente significativa (com correção para comparações múltiplas), com mecanismo operacional plausível e acionável. Endereço divergente, devolução, pagamento pendente e extravio **não** têm causa na origem — os sinais que apareceram eram efeito de composição ou acaso — e são tratados caso a caso.
 
+## A conclusão se mantém?
+
+Rodamos o modelo inteiro de novo (`analise/robustez.py`) variando, uma de cada vez, as premissas mais incertas — tolerância do cliente à espera, tabela de cancelamento ±50%, valor da recompra ×0,5 e ×2, sem contatos, aprovação mais lenta, capacidade menor — e todas juntas no pior sentido.
+
+| Cenário | Recuperado com o agente | % do evitável | Fila zera |
+|---|---|---|---|
+| Premissas do modelo | R$ 32,7 mil | 95% | 5 dias (vs. 14) |
+| Pior variação isolada (cancelamentos −50%) | R$ 24,3 mil | 94% | 5 dias (vs. 14) |
+| **Tudo junto, no pior sentido** | **R$ 20,2 mil** | **91%** | **6 dias (vs. 14)** |
+
+O valor em reais muda com as premissas; a conclusão — priorizar e automatizar recupera mais de 90% do evitável e zera a fila em menos da metade do tempo — não muda.
+
+## Qualidade do agente
+
+Os números usam a política do agente para dizer quem trata cada caso. Para conferir, comparamos com o que a IA decide investigando sozinha: nos 30 casos do lote, **a IA chegou ao mesmo nível de tratamento que a política em 28 (93%)**. As 2 divergências são devoluções em que a IA preferiu acionar a transportadora (sem custo) antes de reenviar. Durante o desenvolvimento, as saídas foram revisadas uma a uma; erros encontrados (endereço inventado, previsão com data passada, ação errada para atraso real) viraram regras verificadas em código.
+
 ## Premissas
 
 As regras que não estão nos parâmetros do negócio estão listadas no app (Visão geral → Premissas) e em `analise/motor.py`. As principais: o cliente cancela com base na data que foi prometida a ele; quando a exceção é tratada o risco para de crescer; uma exceção vira "mal resolvida" gradualmente entre 2 e 10 dias úteis de espera; o limite do agente é R$ 200 (≈ 2× o ticket médio — testamos de R$ 100 a sem limite e acima disso o ganho é mínimo).

@@ -22,12 +22,12 @@ export function ChipNivel({ nivel }: { nivel: LinhaFila["nivel"] }) {
   );
 }
 
-export default function FilaTabela({ linhas }: { linhas: LinhaFila[] }) {
+export default function FilaTabela({ linhas, abrirInicial = null }: { linhas: LinhaFila[]; abrirInicial?: string | null }) {
   const [aba, setAba] = useState<Aba>("time");
   const [tipo, setTipo] = useState("");
   const [busca, setBusca] = useState("");
   const [pagina, setPagina] = useState(0);
-  const [aberto, setAberto] = useState<string | null>(null);
+  const [aberto, setAberto] = useState<string | null>(abrirInicial);
 
   const base = useMemo(() => ({
     time: linhas.filter((l) => l.dia_agente === 0 && l.nivel !== "auto"),

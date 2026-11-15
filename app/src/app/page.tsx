@@ -1,6 +1,6 @@
 import Link from "next/link";
-import { ArrowRight, Calculator, Bot, Factory } from "lucide-react";
-import { resumo, causas } from "@/lib/data";
+import { ArrowRight, Calculator, Bot, Factory, ListOrdered, Play, ShieldCheck } from "lucide-react";
+import { resumo, causas, robustez } from "@/lib/data";
 import { mil, n, reais, NIVEL } from "@/lib/format";
 import { BarrasCenarios, LinhaFilaRestante, Legenda } from "@/components/Graficos";
 
@@ -33,19 +33,41 @@ export default function VisaoGeral() {
         <h1 className="mt-3 max-w-3xl text-[28px] font-semibold leading-tight tracking-tight sm:text-[34px]">
           Com o agente, a operação recupera <span className="text-accent-ink">{mil(r.economia_agente)}</span> desta fila
           e zera as exceções em <span className="text-accent-ink">{c.agente.dias_para_zerar} dias úteis</span>, não {c.fifo.dias_para_zerar}.
+          {" "}Corrigindo 9 causas na origem, evita outros <span className="text-accent-ink">{mil(r.causas_custo_mensal)} por mês</span>.
         </h1>
         <p className="mt-3 max-w-3xl text-ink-2">
           Hoje são {n(r.n_excecoes)} exceções abertas ({reais(r.valor_pedidos)} em pedidos), tratadas por ordem de chegada com capacidade
-          de 150 por dia. Os 150 casos mais urgentes esperariam, em média, {r.top150_espera_fifo.toFixed(0)} dias úteis na fila.
+          de 150 por dia. Sem tratamento, a perda esperada chega a {mil(r.perda_sem_tratar_20d)} em 4 semanas, e os 150 casos mais urgentes
+          esperariam, em média, {r.top150_espera_fifo.toFixed(0)} dias úteis na fila.
         </p>
+      </section>
+
+      {/* Comece por aqui */}
+      <section className="card p-5">
+        <h2 className="text-xs font-medium uppercase tracking-[0.12em] text-muted">Comece por aqui · 1 minuto</h2>
+        <div className="mt-3 grid grid-cols-1 gap-3 md:grid-cols-3">
+          {[
+            { href: "/fila", n: 1, icone: ListOrdered, titulo: "Veja a fila do dia", texto: "O que tratar hoje, em ordem de dinheiro em risco, e quem trata cada caso." },
+            { href: "/fila?abrir=EX0607", n: 2, icone: Play, titulo: "Rode o agente num pedido", texto: "Clique em “Rodar agente agora” e veja a IA investigar, decidir e escrever ao cliente." },
+            { href: "/processo#imp02", n: 3, icone: Factory, titulo: "Veja um problema de processo", texto: "Uma impressora gera metade das falhas. Abra o relatório que o agente escreveu." },
+          ].map(({ href, n: num, icone: Icone, titulo, texto }) => (
+            <Link key={href} href={href} className="group flex gap-3 rounded-xl border border-line p-4 transition-colors hover:border-accent hover:bg-accent-soft/40">
+              <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-accent text-sm font-semibold text-white">{num}</span>
+              <div>
+                <div className="flex items-center gap-1.5 font-medium"><Icone size={15} className="text-ink-2" />{titulo}<ArrowRight size={14} className="text-muted transition-transform group-hover:translate-x-0.5" /></div>
+                <p className="mt-1 text-sm text-ink-2">{texto}</p>
+              </div>
+            </Link>
+          ))}
+        </div>
       </section>
 
       {/* Tiles */}
       <section className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
-        <Tile rotulo="Perda se nada for feito" valor={mil(r.perda_sem_tratar_20d)} detalhe="em 4 semanas, sem tratar a fila" />
-        <Tile rotulo="Recuperado vs. hoje" valor={mil(r.economia_agente)} detalhe={`${Math.floor(pctRecuperado * 100)}% da perda que dava para evitar`} destaque />
+        <Tile rotulo="Recuperado nesta fila" valor={mil(r.economia_agente)} detalhe={`${Math.floor(pctRecuperado * 100)}% da perda que dava para evitar`} destaque />
         <Tile rotulo="Fila zera em" valor={`${c.agente.dias_para_zerar} dias úteis`} detalhe={`hoje: ${c.fifo.dias_para_zerar} dias úteis`} />
         <Tile rotulo="Tempo do time" valor={`−${Math.round(reducao * 100)}%`} detalhe={`${n(horasHoje)} h → ${n(horasAgente)} h para tratar a fila`} />
+        <Tile rotulo="Evitável na origem, por mês" valor={mil(r.causas_custo_mensal)} detalhe={`≈ R$ ${Math.round((r.causas_custo_mensal * 12) / 1000)} mil por ano e ${Math.round(r.causas_horas_mes)} h do time por mês`} destaque />
       </section>
 
       {/* Cenários */}
@@ -158,6 +180,37 @@ export default function VisaoGeral() {
             ))}
           </ul>
           <Link href="/processo" className="btn btn-ghost mt-auto self-start">Ver os {causas.filter((x) => !x.monitorar).length} problemas <ArrowRight size={16} /></Link>
+        </div>
+      </section>
+
+      {/* Robustez */}
+      <section className="card p-5">
+        <h2 className="flex items-center gap-2 font-semibold"><ShieldCheck size={18} className="text-ink-2" /> A conclusão se mantém se as premissas estiverem erradas?</h2>
+        <p className="mt-1 max-w-3xl text-sm text-ink-2">
+          Rodamos o modelo inteiro de novo variando, uma de cada vez, as premissas mais incertas, e depois todas juntas no pior sentido.
+          Em todos os casos, priorizar e usar o agente recupera mais de 90% da perda evitável e zera a fila em menos da metade do tempo.
+        </p>
+        <div className="mt-4 overflow-x-auto">
+          <table className="w-full min-w-[560px] text-sm">
+            <thead>
+              <tr className="border-b border-line text-left text-xs text-muted">
+                <th className="py-2 font-normal">Cenário</th>
+                <th className="py-2 text-right font-normal">Recuperado com o agente</th>
+                <th className="py-2 text-right font-normal">% do evitável</th>
+                <th className="py-2 text-right font-normal">Fila zera (vs. hoje)</th>
+              </tr>
+            </thead>
+            <tbody>
+              {robustez.map((x) => (
+                <tr key={x.id} className={`border-b border-line last:border-0 ${x.id === "base" || x.id === "pessimista" ? "font-medium" : ""}`}>
+                  <td className="py-2 pr-4">{x.rotulo}</td>
+                  <td className="tabular py-2 text-right">{mil(x.economia_agente)}</td>
+                  <td className="tabular py-2 text-right">{x.pct_recuperado !== null ? `${Math.floor(x.pct_recuperado * 100)}%` : "—"}</td>
+                  <td className="tabular py-2 text-right text-ink-2">{x.dias_agente} dias ({x.dias_fifo})</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
         </div>
       </section>
 

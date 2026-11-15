@@ -55,3 +55,9 @@ import type { Decisao, Relatorio } from "@/lib/agente/tipos";
 
 export const lote = loteJson as { gerado_em: string | null; modo: "ia" | "simulado" | null; decisoes: (Decisao & { correcoes?: number })[] };
 export const relatorios = relatoriosJson as Record<string, Relatorio>;
+
+import robustezJson from "@/data/robustez.json";
+export const robustez = robustezJson as {
+  id: string; rotulo: string; economia_agente: number; economia_prioridade: number; pct_recuperado: number | null;
+  dias_agente: number; dias_fifo: number;
+}[];

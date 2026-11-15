@@ -2,7 +2,8 @@ import { fila, linhaFila, resumo } from "@/lib/data";
 import FilaTabela from "@/components/FilaTabela";
 import { n } from "@/lib/format";
 
-export default function FilaPage() {
+export default async function FilaPage({ searchParams }: { searchParams: Promise<{ abrir?: string }> }) {
+  const { abrir } = await searchParams;
   const linhas = fila.map(linhaFila);
   const time = linhas.filter((l) => l.dia_agente === 0 && l.nivel !== "auto");
   const aprov = time.filter((l) => l.nivel === "aprovacao").length;
@@ -17,7 +18,7 @@ export default function FilaPage() {
           {" "}<b className="text-ink">{aprov} aprovações</b> e <b className="text-ink">{time.length - aprov} casos que precisam de uma pessoa</b>.
         </p>
       </section>
-      <FilaTabela linhas={linhas} />
+      <FilaTabela linhas={linhas} abrirInicial={abrir ?? null} />
     </div>
   );
 }

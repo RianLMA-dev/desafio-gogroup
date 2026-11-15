@@ -34,11 +34,17 @@ LIMIAR_VIP = 1500               # receita acumulada
 P_RECOMPRA_VIP, P_RECOMPRA_DEMAIS = 0.70, 0.28
 FATOR_MAL_RESOLVIDA = 0.5       # recompra cai pela metade
 
+# Botões das premissas mais incertas (usados na análise de robustez — analise/robustez.py)
+MAL_INICIO, MAL_RAMPA = 2, 8    # "mal resolvida": 0% até 2 dias úteis de espera, 100% com 2+8 = 10
+MULT_CANCEL = 1.0               # multiplicador da tabela de cancelamento
+MULT_RECOMPRA = 1.0             # multiplicador do valor de recompra
+CONTATO_A_CADA = 10             # cliente procura o atendimento 1x a cada N dias úteis de espera
+
 
 def p_cancelamento(dias_uteis_atraso):
     """Tabela de cancelamento por dias úteis de atraso (parametros.md)."""
     d = np.asarray(dias_uteis_atraso)
-    return np.select([d <= 0, d <= 2, d <= 5, d <= 10], [0.0, 0.04, 0.10, 0.22], 0.40)
+    return np.minimum(1.0, MULT_CANCEL * np.select([d <= 0, d <= 2, d <= 5, d <= 10], [0.0, 0.04, 0.10, 0.22], 0.40))
 
 
 # ---------------------------------------------------------------------------
@@ -124,7 +130,7 @@ def carregar():
     e["vip"] = e["receita_acumulada"] > LIMIAR_VIP
     e["ticket_medio"] = e["receita_acumulada"] / e["n_pedidos"].clip(lower=1)
     e["p_recompra"] = np.where(e["vip"], P_RECOMPRA_VIP, P_RECOMPRA_DEMAIS)
-    e["valor_cliente"] = e["p_recompra"] * e["ticket_medio"] * (1 - CMV)   # valor futuro esperado
+    e["valor_cliente"] = e["p_recompra"] * e["ticket_medio"] * (1 - CMV) * MULT_RECOMPRA   # valor futuro esperado
     e["custo_reenvio"] = e["valor"] * CMV + e["custo_medio_frete"]
     return e
 
@@ -161,20 +167,20 @@ def perda(r, d, promessa_correta=False):
 
     if t == "atraso_entrega" and r["entregue"]:
         # atraso encerrado: dano à recompra proporcional ao atraso que já aconteceu (custo afundado)
-        mal = min(1.0, max(0.0, (atraso_base - 2) / 8))
+        mal = min(1.0, max(0.0, (atraso_base - MAL_INICIO) / MAL_RAMPA))
         return dict(cancel=0.0, resolucao=0.0, recompra=r["valor_cliente"] * FATOR_MAL_RESOLVIDA * mal, contatos=0.0, venda=0.0)
 
     pre_entrega = t in ("atraso_entrega", "rastreio_parado", "extravio")
     espera = r["dias_aberta"] + d
     atraso_cli = (atraso_base + d) if pre_entrega else espera
     pc = float(p_cancelamento(atraso_cli))
-    mal = min(1.0, max(0.0, (espera - 2) / 8))
+    mal = min(1.0, max(0.0, (espera - MAL_INICIO) / MAL_RAMPA))
     res = custo_resolucao(r)
     return dict(
         cancel=pc * r["valor"],
         resolucao=(1 - pc) * res,
         recompra=r["valor_cliente"] * FATOR_MAL_RESOLVIDA * mal,
-        contatos=CUSTO_CONTATO * min(espera / 10, 3),
+        contatos=CUSTO_CONTATO * min(espera / CONTATO_A_CADA, 3),
         venda=0.0,
     )
 
