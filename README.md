@@ -2,7 +2,7 @@
 
 **Problema 2 · Operações.** Uma central que prioriza, investiga e ajuda a resolver os pedidos com exceção, com dois agentes de IA trabalhando dentro dela.
 
-🔗 **Solução publicada:** _(link do Vercel)_
+🔗 **Solução publicada:** https://desafio-gogroup.vercel.app · **Código:** https://github.com/RianLMA-dev/desafio-gogroup
 
 ## O resultado em uma frase
 
