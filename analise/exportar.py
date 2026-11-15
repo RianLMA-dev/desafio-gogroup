@@ -77,7 +77,7 @@ def causas(e):
          "Avisar os clientes com 'falso atraso' da data correta (Agente de Fila já faz)."],
         dict(tipo="barras", titulo="Diferença entre promessa e prazo correto (dias úteis)",
              dados=[{"grupo": f"{k} dia(s)", "casos": int(v)} for k, v in e.promessa_erro_dias.value_counts().sort_index().items()]),
-        "Um terço dos atrasos não são atrasos: o sistema promete um prazo que a operação não consegue cumprir.",
+        "Quase um terço dos atrasos (30%) não são atrasos: o sistema promete um prazo que a operação não consegue cumprir.",
         custo_override=custo_bug)
 
     # 2. Rota Express no Nordeste
@@ -110,7 +110,7 @@ def causas(e):
          "Exigir manuseio de frágil ou reforçar a embalagem de fragrâncias enviadas por ela.",
          "Avaliar trocar a transportadora para itens em vidro."],
         dict(tipo="barras", titulo="% das exceções que são avaria, por transportadora", dados=tabela(e, av, "transportadora")),
-        "A Carga Norte quebra 3x mais que as outras, principalmente perfumes e frascos de vidro.")
+        "Na Carga Norte, avaria é 6 vezes mais frequente que nas outras transportadoras, principalmente com perfumes e frascos de vidro.")
 
     # 4. IMP-02
     gc = e.marca == "Gocase"
@@ -162,7 +162,7 @@ def causas(e):
          "Reenviar de outro lote e checar pedidos ainda não entregues com esse lote."],
         dict(tipo="barras", titulo="Vazamentos por lote (top 6)",
              dados=[{"grupo": k_, "casos": int(v)} for k_, v in e[vz].lote_produto.value_counts().head(6).items()]),
-        "Um único lote de um único produto responde por 70% de todos os vazamentos.")
+        "Um único lote de um único produto responde por dois de cada três vazamentos (76 de 113).")
 
     # 7. Ruptura Kokeshi
     ksh = e.sku.isin(["KSH-1009", "KSH-1010", "KSH-1011"])

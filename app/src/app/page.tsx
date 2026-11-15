@@ -58,7 +58,7 @@ export default function VisaoGeral() {
           {[
             { href: "/fila", n: 1, icone: ListOrdered, titulo: "Veja a fila do dia", texto: "O que tratar hoje, em ordem de dinheiro em risco, e quem trata cada caso.", ia: false },
             { href: "/fila?abrir=EX0607", n: 2, icone: Play, titulo: "Rode o agente num pedido", texto: "Clique em “Rodar agente agora” e veja a IA investigar, decidir e escrever ao cliente.", ia: true },
-            { href: "/processo#imp02", n: 3, icone: Factory, titulo: "Veja um problema de processo", texto: "Uma impressora gera metade das falhas. Abra o relatório que o agente escreveu.", ia: false },
+            { href: "/processo#imp02", n: 3, icone: Factory, titulo: "Veja um problema de processo", texto: "Uma impressora gera mais da metade das falhas. Abra o relatório que o agente escreveu.", ia: false },
           ].map(({ href, n: num, icone: Icone, titulo, texto, ia }) => (
             <Link key={href} href={href} className={`card group flex gap-3 p-4 transition-all hover:-translate-y-0.5 hover:shadow-md ${ia ? "border-ai-line hover:border-ai" : "hover:border-accent"}`}>
               <span className={`flex h-7 w-7 shrink-0 items-center justify-center rounded-full text-sm font-semibold text-white ${ia ? "bg-ai" : "bg-accent"}`}>{num}</span>

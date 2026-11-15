@@ -4,7 +4,7 @@
   "titulo": "Prazo prometido calculado em dias corridos",
   "categoria": "Sistema",
   "responsavel": "Tecnologia (checkout)",
-  "resumo": "Um terço dos atrasos não são atrasos: o sistema promete um prazo que a operação não consegue cumprir.",
+  "resumo": "Quase um terço dos atrasos (30%) não são atrasos: o sistema promete um prazo que a operação não consegue cumprir.",
   "evidencia": [
    "100% das 2.042 datas prometidas = data do pedido + 1 + SLA em dias corridos; a regra é em dias úteis.",
    "A promessa sai em média 1,9 dias úteis antes do prazo possível (até 5).",
@@ -587,7 +587,7 @@
   "titulo": "Carga Norte danificando produtos frágeis",
   "categoria": "Transportadora",
   "responsavel": "Logística (gestão de transportadoras)",
-  "resumo": "A Carga Norte quebra 3x mais que as outras, principalmente perfumes e frascos de vidro.",
+  "resumo": "Na Carga Norte, avaria é 6 vezes mais frequente que nas outras transportadoras, principalmente com perfumes e frascos de vidro.",
   "evidencia": [
    "102 das 192 avarias são da Carga Norte: 30% das exceções dela, contra 5% nas outras.",
    "Concentrado em fragrâncias e itens em vidro: Lescent, Barbour's e Rituária (todas as avarias Rituária foram com ela)."
@@ -1153,7 +1153,7 @@
   "titulo": "Lote L2607-B do Condicionador Ápice 1000ml com defeito",
   "categoria": "Fornecedor / qualidade",
   "responsavel": "Qualidade e Compras",
-  "resumo": "Um único lote de um único produto responde por 70% de todos os vazamentos.",
+  "resumo": "Um único lote de um único produto responde por dois de cada três vazamentos (76 de 113).",
   "evidencia": [
    "76 dos 113 vazamentos são do mesmo produto e lote: Cond Ativ Anti-Frizz Ápice 1000ml, lote L2607-B.",
    "76 dos 84 problemas desse produto são vazamento.",

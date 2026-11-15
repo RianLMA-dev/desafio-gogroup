@@ -72,7 +72,7 @@ PREMISSAS = [
 LIMITE_VALOR_AGENTE = 200      # ≈ 2× o ticket médio das exceções (R$ 110), arredondado para baixo
 MIN_TRATATIVA, MIN_APROVACAO = 12, 2
 MINUTOS_DIA = CAPACIDADE_DIA * MIN_TRATATIVA
-ACOES_COM_APROVACAO = {"reenvio_com_foto", "nova_producao", "reenvio_endereco"}
+ACOES_COM_APROVACAO = {"reenvio_com_foto", "reenvio_outro_lote", "nova_producao", "reenvio_endereco"}
 LIMITE_CONTATOS_AGENTE = 3
 TIPOS_SEMPRE_HUMANO = {"extravio", "ruptura_pos_venda"}
 
@@ -208,6 +208,8 @@ def acao_padrao(r):
         return "confirmar_endereco", "Pedir confirmação de endereço ao cliente"
     if t == "falha_personalizacao":
         return "nova_producao", "Reproduzir personalização em outra impressora"
+    if t == "vazamento_produto" and r["lote_produto"] == "L2607-B" and r["sku"] == "APC-1067":
+        return "reenvio_outro_lote", "Reenviar de outro lote (L2607-B tem defeito)"
     if t in ("avaria_transporte", "vazamento_produto", "item_faltante"):
         return "reenvio_com_foto", "Pedir foto e reenviar sem custo (política)"
     if t == "devolvido_transportadora":

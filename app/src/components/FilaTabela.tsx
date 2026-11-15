@@ -1,6 +1,6 @@
 "use client";
 import { useMemo, useState } from "react";
-import { Search, Sparkles, Crown } from "lucide-react";
+import { Search, Sparkles, Crown, ChevronRight, MousePointerClick } from "lucide-react";
 import type { LinhaFila } from "@/lib/data";
 import { reais, NIVEL } from "@/lib/format";
 import DetalhePainel from "./DetalhePainel";
@@ -73,9 +73,13 @@ export default function FilaTabela({ linhas, abrirInicial = null }: { linhas: Li
         </div>
       </div>
 
+      <div className="flex items-center gap-2 border-b border-line bg-ai-soft/40 px-4 py-2 text-xs text-ink-2">
+        <MousePointerClick size={14} className="shrink-0 text-ai" />
+        Clique em um pedido para ver por que ele está nessa posição e rodar o agente de IA.
+      </div>
       {/* Tabela */}
       <div className="max-h-[70vh] overflow-auto">
-        <table className="w-full min-w-[760px] text-sm">
+        <table className="w-full min-w-[860px] text-sm">
           <thead>
             <tr className="sticky top-0 z-10 border-b border-line bg-surface-2/95 text-left text-xs text-muted shadow-[0_1px_0_var(--line)] backdrop-blur">
               <th className="py-2 pl-4 font-normal">#</th>
@@ -84,12 +88,13 @@ export default function FilaTabela({ linhas, abrirInicial = null }: { linhas: Li
               <th className="py-2 text-right font-normal">Valor</th>
               <th className="py-2 pl-4 font-normal" title="Quanto a perda esperada cresce se o caso esperar mais 5 dias úteis">Risco se esperar 1 semana</th>
               <th className="py-2 pl-6 font-normal">Quem trata</th>
-              <th className="py-2 pr-4 font-normal">Ação</th>
+              <th className="py-2 pr-2 font-normal">Ação</th>
+              <th className="py-2 pr-4"><span className="sr-only">Abrir</span></th>
             </tr>
           </thead>
           <tbody>
             {visiveis.map((l) => (
-              <tr key={l.id} onClick={() => setAberto(l.id)} className="cursor-pointer border-b border-line last:border-0 hover:bg-surface-2">
+              <tr key={l.id} onClick={() => setAberto(l.id)} className="group cursor-pointer border-b border-line last:border-0 hover:bg-surface-2">
                 <td className="tabular py-2.5 pl-4 text-muted">{l.rank}</td>
                 <td className="py-2.5">
                   <div className="flex items-center gap-1.5 font-medium">{l.pedido}{l.vip && <Crown size={13} className="text-serious-ink" aria-label="Cliente VIP" />}</div>
@@ -109,15 +114,21 @@ export default function FilaTabela({ linhas, abrirInicial = null }: { linhas: Li
                   </div>
                 </td>
                 <td className="py-2.5 pl-6"><ChipNivel nivel={l.nivel} /></td>
-                <td className="max-w-[260px] py-2.5 pr-4 text-ink-2">
+                <td className="max-w-[240px] py-2.5 pr-2 text-ink-2">
                   <span className="inline-flex items-start gap-1.5">
                     {l.nivel !== "humano" && <Sparkles size={13} className="mt-[3px] shrink-0 text-ai" aria-label="Decidido pelo agente" />}
                     {l.acao_texto}
                   </span>
                 </td>
+                <td className="py-2.5 pr-4 text-right">
+                  <button onClick={(ev) => { ev.stopPropagation(); setAberto(l.id); }}
+                    className="inline-flex items-center gap-0.5 whitespace-nowrap rounded-lg border border-line px-2.5 py-1 text-xs font-medium text-ink-2 transition-colors group-hover:border-ai group-hover:bg-ai group-hover:text-white">
+                    Detalhes <ChevronRight size={14} />
+                  </button>
+                </td>
               </tr>
             ))}
-            {visiveis.length === 0 && <tr><td colSpan={7} className="py-10 text-center text-muted">Nenhuma exceção com esses filtros.</td></tr>}
+            {visiveis.length === 0 && <tr><td colSpan={8} className="py-10 text-center text-muted">Nenhuma exceção com esses filtros.</td></tr>}
           </tbody>
         </table>
       </div>

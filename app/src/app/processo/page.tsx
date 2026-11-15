@@ -15,7 +15,7 @@ export default function ProcessoPage() {
       <section>
         <div className="text-xs font-medium uppercase tracking-[0.12em] text-muted">Problemas de processo · Agente de Processo</div>
         <h1 className="mt-3 max-w-3xl text-[28px] font-semibold leading-tight tracking-tight">
-          {ativas.length} causas na origem geram {n(casosLigados)} exceções evitáveis e custam {mil(resumo.causas_custo_mensal)} por mês
+          {ativas.length} causas na origem geraram {n(casosLigados)} exceções evitáveis em 2 meses e custam {mil(resumo.causas_custo_mensal)} por mês
         </h1>
         <p className="mt-2 max-w-3xl text-ink-2">
           Tratar caso a caso não resolve: elas voltam todo dia. O Agente de Processo compara cada tipo de exceção com cada máquina, turno, lote,

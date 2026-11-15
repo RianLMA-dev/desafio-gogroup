@@ -16,6 +16,22 @@
 
 Além disso, **9 causas na origem** geram exceções que voltam todo dia e custam **≈ R$ 26 mil por mês e 93 horas do time por mês**. O Agente de Processo encontra e documenta cada uma.
 
+![Visão geral](docs/visao-geral.png)
+
+## Como avaliar em 2 minutos
+
+1. **Abra a [solução](https://desafio-gogroup.vercel.app)** e leia o bloco de destaque da Visão geral: o resultado e de onde ele vem.
+2. **Clique em "Rode o agente num pedido"** (passo 2 do "Comece por aqui") e depois em **Rodar agente agora**. O Agente de Fila investiga o pedido com ferramentas, mostra o que descobriu, decide dentro da política e escreve ao cliente. Depois de enviada, clique em **Simular resposta do cliente**.
+3. **Na Fila do dia, clique em Iniciar piloto automático** e veja o agente tratar 10 casos seguidos.
+4. **Em Problemas de processo**, veja o mapa de onde cada causa nasce e abra um **relatório de incidente** escrito pelo Agente de Processo.
+5. **Em Ações do agente**, veja a qualidade medida (IA de acordo com a política em 93% dos casos) e aprove ou rejeite reenvios.
+
+| O agente investigando e conversando | O piloto automático |
+|---|---|
+| ![Agente de Fila ao vivo](docs/agente.png) | ![Piloto automático](docs/piloto.png) |
+
+![Problemas de processo](docs/processo.png)
+
 ## Como funciona
 
 ```
@@ -93,6 +109,7 @@ As regras que não estão nos parâmetros do negócio estão listadas no app (Vi
 ```
 analise/   Motor de cálculo e análises em Python (pandas, numpy, scipy)
 dados/     Dados do desafio (sintéticos)
+docs/      Capturas de tela usadas neste README
 app/       Site Next.js 15 + Tailwind + Recharts, agentes via API do Groq
 ```
 
