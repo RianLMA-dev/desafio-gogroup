@@ -1,8 +1,9 @@
 "use client";
 import { useEffect, useRef, useState } from "react";
-import { X, Check, Loader2, AlertTriangle, Truck, Bot, CheckCheck, Clock, UserRound, Factory, MessageCircleReply, Image as ImageIcon } from "lucide-react";
+import { X, Check, Loader2, AlertTriangle, Truck, CheckCheck, Clock, UserRound, MessageCircleReply, Image as ImageIcon } from "lucide-react";
 import type { Decisao, Evento } from "@/lib/agente/tipos";
 import { salvarExecucao, marcarAprovacao, lerAprovacoes } from "@/lib/execucoes";
+import AgenteAvatar from "./AgenteAvatar";
 import { NIVEL } from "@/lib/format";
 
 const espera = (ms: number) => new Promise((r) => setTimeout(r, ms));
@@ -182,7 +183,7 @@ export default function CelularAgente({ id, onFechar }: { id: string; onFechar: 
     <aside className="slide-in fixed inset-y-0 right-0 z-50 flex w-full flex-col overflow-y-auto border-l border-line bg-surface-2 shadow-2xl sm:max-w-[420px] lg:right-[520px] lg:z-40 lg:shadow-none">
       <header className="sticky top-0 z-10 flex items-start justify-between bg-surface-2 px-5 pb-2 pt-5">
         <div>
-          <div className="flex items-center gap-2 font-semibold"><Bot size={18} className="text-accent" /> Agente de Fila</div>
+          <div className="flex items-center gap-2.5 font-semibold"><AgenteAvatar tipo="fila" tamanho={28} /> Agente de Fila</div>
           <div className="mt-0.5 text-xs text-muted">
             {rodando ? "investigando o caso…" : modo === "simulado" || d?.simulado ? "modo simulado (sem IA)" : d ? `concluído · ${d.modelo}` : "concluído"}
           </div>
@@ -199,14 +200,14 @@ export default function CelularAgente({ id, onFechar }: { id: string; onFechar: 
             </div>
             {p.achado && <div className="ml-[23px] mt-0.5 text-[13px] font-medium text-ink">{p.achado}</div>}
             {p.instrucao && (
-              <div className="ml-[23px] mt-1.5 rounded-lg border border-accent/30 bg-accent-soft px-3 py-2 text-[12.5px] text-accent-ink">
-                <div className="mb-0.5 flex items-center gap-1.5 text-[11px] font-semibold uppercase tracking-wide"><Factory size={12} /> Instrução do Agente de Processo</div>
+              <div className="ml-[23px] mt-1.5 rounded-lg border border-ai-line bg-ai-soft px-3 py-2 text-[12.5px] text-ai-strong">
+                <div className="mb-1 flex items-center gap-1.5 text-[11px] font-semibold uppercase tracking-wide"><AgenteAvatar tipo="processo" tamanho={16} /> Instrução do Agente de Processo</div>
                 {p.instrucao}
               </div>
             )}
           </li>
         ))}
-        {rodando && <li className="flex items-center gap-2 text-sm text-muted"><Loader2 size={15} className="animate-spin" /> pensando…</li>}
+        {rodando && <li className="flex items-center gap-2 text-sm text-ai-strong"><Loader2 size={15} className="animate-spin" /> pensando…</li>}
       </ol>
       {aviso && <div className="mx-5 mt-3 rounded-lg bg-serious-soft px-3 py-2 text-xs text-serious-ink">{aviso}</div>}
 

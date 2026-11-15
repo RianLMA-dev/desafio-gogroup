@@ -10,6 +10,7 @@
     "agente:lote": "node scripts/processar-lote.mjs"
   },
   "dependencies": {
+    "geist": "^1.4.2",
     "lucide-react": "^0.468.0",
     "next": "15.5.29",
     "react": "19.1.0",

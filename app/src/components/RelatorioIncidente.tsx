@@ -1,7 +1,8 @@
 "use client";
 import { useState } from "react";
-import { FileText, X, Loader2, RefreshCw, Bot } from "lucide-react";
+import { FileText, X, Loader2, RefreshCw } from "lucide-react";
 import type { Relatorio } from "@/lib/agente/tipos";
+import AgenteAvatar from "./AgenteAvatar";
 
 const COR_SEV: Record<string, string> = { "crítica": "var(--critical)", alta: "var(--serious)", "média": "var(--warning)", baixa: "var(--muted)" };
 
@@ -24,15 +25,15 @@ export default function RelatorioIncidente({ id, salvo }: { id: string; salvo?: 
 
   return (
     <>
-      <button onClick={abrir} className="btn btn-ghost shrink-0"><FileText size={15} /> {salvo ? "Ver relatório de incidente" : "Gerar relatório de incidente"}</button>
+      <button onClick={abrir} className="btn btn-ghost shrink-0 border-ai-line text-ai-strong hover:bg-ai-soft"><FileText size={15} /> {salvo ? "Ver relatório de incidente" : "Gerar relatório de incidente"}</button>
       {aberto && (
         <div className="fixed inset-0 z-50 flex items-end justify-center bg-black/30 sm:items-center sm:p-6" onClick={() => setAberto(false)}>
           <div className="max-h-[92vh] w-full max-w-2xl overflow-y-auto rounded-t-2xl bg-surface p-6 shadow-2xl sm:rounded-2xl" onClick={(e) => e.stopPropagation()}>
             <div className="flex items-start justify-between gap-4">
-              <div className="flex items-center gap-2 text-xs font-medium uppercase tracking-[0.1em] text-muted"><Bot size={14} className="text-accent" /> Relatório de incidente · Agente de Processo</div>
+              <div className="flex items-center gap-2 text-xs font-medium uppercase tracking-[0.1em] text-ai-strong"><AgenteAvatar tipo="processo" tamanho={22} /> Relatório de incidente · Agente de Processo</div>
               <button onClick={() => setAberto(false)} aria-label="Fechar" className="rounded-lg p-1 hover:bg-surface-2"><X size={20} /></button>
             </div>
-            {carregando && <div className="flex items-center gap-2 py-16 text-sm text-muted"><Loader2 size={16} className="animate-spin" /> O agente está analisando a evidência e escrevendo o relatório…</div>}
+            {carregando && <div className="flex items-center gap-2 py-16 text-sm text-muted"><Loader2 size={16} className="animate-spin text-ai" /> O agente está analisando a evidência e escrevendo o relatório…</div>}
             {erro && <div className="mt-4 rounded-lg bg-critical-soft px-3 py-2 text-sm text-critical">{erro}</div>}
             {rel && !carregando && (
               <article className="mt-3">

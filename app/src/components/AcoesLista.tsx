@@ -61,7 +61,7 @@ export default function AcoesLista({ lote, extras }: { lote: D[]; extras: Record
                 <div className="flex items-center gap-2 text-xs text-muted">#{x?.rank} · {d.id}{d.correcoes ? <span className="flex items-center gap-1 text-serious-ink"><ShieldCheck size={12} /> corrigida pela política</span> : null}</div>
                 <div className="mt-0.5 font-medium">{d.pedido} · {x?.tipo_rotulo}</div>
                 <div className="mt-1 flex items-start gap-1.5 text-sm text-ink">
-                  <Sparkles size={13} className="mt-[3px] shrink-0 text-accent" />{d.acao_rotulo}
+                  <Sparkles size={13} className="mt-[3px] shrink-0 text-ai" />{d.acao_rotulo}
                 </div>
                 <p className="mt-1 text-sm text-ink-2">{d.justificativa}</p>
               </div>

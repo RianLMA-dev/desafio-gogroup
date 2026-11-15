@@ -6,7 +6,7 @@ import { ShieldCheck } from "lucide-react";
 export default function AcoesPage() {
   // dados de todas as exceções, para também mostrar execuções ao vivo de qualquer caso
   const extras = Object.fromEntries(fila.map((e) => [e.id, { tipo_rotulo: e.tipo_rotulo, valor: e.valor, rank: e.rank }]));
-  const quando = lote.gerado_em ? new Date(lote.gerado_em).toLocaleString("pt-BR", { dateStyle: "short", timeStyle: "short" }) : null;
+  const quando = lote.gerado_em ? new Date(lote.gerado_em).toLocaleString("pt-BR", { dateStyle: "short", timeStyle: "short", timeZone: "America/Sao_Paulo" }) : null;
   const modelos = [...new Set(lote.decisoes.filter((d) => !d.simulado).map((d) => d.modelo))];
 
   // Qualidade: a IA chega ao mesmo nível de tratamento que a política usada nos números?

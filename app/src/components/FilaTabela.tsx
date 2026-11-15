@@ -35,6 +35,7 @@ export default function FilaTabela({ linhas, abrirInicial = null }: { linhas: Li
     todas: linhas,
   }), [linhas]);
 
+  const maxScore = useMemo(() => Math.max(...linhas.map((l) => l.score), 1), [linhas]);
   const tipos = useMemo(() => Array.from(new Map(linhas.map((l) => [l.tipo, l.tipo_rotulo]))).sort((a, b) => a[1].localeCompare(b[1])), [linhas]);
 
   const filtradas = useMemo(() => {
@@ -73,15 +74,15 @@ export default function FilaTabela({ linhas, abrirInicial = null }: { linhas: Li
       </div>
 
       {/* Tabela */}
-      <div className="overflow-x-auto">
+      <div className="max-h-[70vh] overflow-auto">
         <table className="w-full min-w-[760px] text-sm">
           <thead>
-            <tr className="border-b border-line bg-surface-2 text-left text-xs text-muted">
+            <tr className="sticky top-0 z-10 border-b border-line bg-surface-2/95 text-left text-xs text-muted shadow-[0_1px_0_var(--line)] backdrop-blur">
               <th className="py-2 pl-4 font-normal">#</th>
               <th className="py-2 font-normal">Pedido</th>
               <th className="py-2 font-normal">Exceção</th>
               <th className="py-2 text-right font-normal">Valor</th>
-              <th className="py-2 text-right font-normal" title="Quanto a perda esperada cresce se o caso esperar mais 5 dias úteis">Risco se esperar 1 semana</th>
+              <th className="py-2 pl-4 font-normal" title="Quanto a perda esperada cresce se o caso esperar mais 5 dias úteis">Risco se esperar 1 semana</th>
               <th className="py-2 pl-6 font-normal">Quem trata</th>
               <th className="py-2 pr-4 font-normal">Ação</th>
             </tr>
@@ -96,14 +97,21 @@ export default function FilaTabela({ linhas, abrirInicial = null }: { linhas: Li
                 </td>
                 <td className="py-2.5">
                   <div>{l.tipo_rotulo}</div>
-                  {l.causas.length > 0 && <div className="text-xs text-accent-ink">ligado a problema de processo</div>}
+                  {l.causas.length > 0 && <div className="text-xs text-ai-strong">ligado a problema de processo</div>}
                 </td>
                 <td className="tabular py-2.5 text-right">{reais(l.valor)}</td>
-                <td className="tabular py-2.5 text-right font-medium">+{reais(l.score)}</td>
+                <td className="py-2.5 pl-4">
+                  <div className="flex items-center gap-2">
+                    <div className="h-1.5 w-20 overflow-hidden rounded-full bg-surface-2">
+                      <div className="h-full rounded-full" style={{ width: `${Math.max(4, (l.score / maxScore) * 100)}%`, background: "var(--serious)", opacity: 0.35 + 0.65 * (l.score / maxScore) }} />
+                    </div>
+                    <span className="tabular w-14 text-right text-[13px] font-medium">+{reais(l.score)}</span>
+                  </div>
+                </td>
                 <td className="py-2.5 pl-6"><ChipNivel nivel={l.nivel} /></td>
                 <td className="max-w-[260px] py-2.5 pr-4 text-ink-2">
                   <span className="inline-flex items-start gap-1.5">
-                    {l.nivel !== "humano" && <Sparkles size={13} className="mt-[3px] shrink-0 text-accent" aria-label="Decidido pelo agente" />}
+                    {l.nivel !== "humano" && <Sparkles size={13} className="mt-[3px] shrink-0 text-ai" aria-label="Decidido pelo agente" />}
                     {l.acao_texto}
                   </span>
                 </td>

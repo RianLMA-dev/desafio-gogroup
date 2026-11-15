@@ -1,10 +1,11 @@
 "use client";
 import { useEffect, useRef, useState } from "react";
-import { Bot, Pause, Play, X, Check, Loader2, Truck, MessageSquare, Clock, UserRound, Factory } from "lucide-react";
+import { Pause, Play, X, Check, Loader2, Truck, MessageSquare, Clock, UserRound, Factory } from "lucide-react";
 import type { LinhaFila } from "@/lib/data";
 import type { Decisao, Evento } from "@/lib/agente/tipos";
 import { salvarExecucao, lerExecucoes } from "@/lib/execucoes";
 import { reais, NIVEL } from "@/lib/format";
+import AgenteAvatar from "./AgenteAvatar";
 
 const espera = (ms: number) => new Promise((r) => setTimeout(r, ms));
 const LIMITE = 10;
@@ -78,7 +79,7 @@ export function PainelPiloto({ casos, onFechar }: { casos: LinhaFila[]; onFechar
       <div className="flex max-h-[94vh] w-full max-w-4xl flex-col overflow-hidden rounded-t-2xl bg-surface shadow-2xl sm:rounded-2xl">
         <header className="flex items-start justify-between gap-4 border-b border-line p-5">
           <div>
-            <div className="flex items-center gap-2 font-semibold"><Bot size={18} className="text-accent" /> Piloto automático</div>
+            <div className="flex items-center gap-2.5 font-semibold"><AgenteAvatar tipo="fila" tamanho={28} /> Piloto automático</div>
             <p className="mt-1 text-sm text-ink-2">O Agente de Fila trata, ao vivo, os próximos {casos.length} casos da fila dele, um após o outro. Ações sem custo ele executa; reenvios ficam para aprovação.</p>
           </div>
           <div className="flex shrink-0 gap-2">
@@ -104,10 +105,10 @@ export function PainelPiloto({ casos, onFechar }: { casos: LinhaFila[]; onFechar
 
         <ol className="flex-1 divide-y divide-line overflow-y-auto">
           {itens.map((x) => (
-            <li key={x.linha.id} className={`px-5 py-3 ${x.estado === "rodando" ? "bg-accent-soft/50" : ""} ${x.estado === "fila" ? "opacity-50" : ""}`}>
+            <li key={x.linha.id} className={`px-5 py-3 ${x.estado === "rodando" ? "bg-ai-soft/60" : ""} ${x.estado === "fila" ? "opacity-50" : ""}`}>
               <div className="flex items-start gap-3">
                 <div className="mt-0.5 shrink-0">
-                  {x.estado === "rodando" ? <Loader2 size={16} className="animate-spin text-accent" /> :
+                  {x.estado === "rodando" ? <Loader2 size={16} className="animate-spin text-ai" /> :
                    x.estado === "feito" ? <Check size={16} className="text-good" /> :
                    x.estado === "erro" ? <X size={16} className="text-critical" /> : <span className="block h-4 w-4 rounded-full border border-line-strong" />}
                 </div>
@@ -119,7 +120,7 @@ export function PainelPiloto({ casos, onFechar }: { casos: LinhaFila[]; onFechar
                   </div>
                   {x.estado === "rodando" && <div className="mt-1 text-xs text-ink-2">{x.passos[x.passos.length - 1] ?? "Começando a investigar"}…</div>}
                   {x.achado && x.estado !== "fila" && (
-                    <div className="mt-1 flex items-start gap-1.5 text-xs text-ink-2">{x.instrucao && <Factory size={12} className="mt-0.5 shrink-0 text-accent" />}{x.achado}</div>
+                    <div className="mt-1 flex items-start gap-1.5 text-xs text-ink-2">{x.instrucao && <Factory size={12} className="mt-0.5 shrink-0 text-ai" />}{x.achado}</div>
                   )}
                   {x.d && (
                     <div className="mt-1.5 flex flex-col gap-1">
@@ -159,15 +160,15 @@ export default function PilotoAutomatico({ linhas }: { linhas: LinhaFila[] }) {
   };
   return (
     <>
-      <div className="flex flex-col gap-3 rounded-xl border border-accent/30 bg-accent-soft/60 p-4 sm:flex-row sm:items-center sm:justify-between">
+      <div className="flex flex-col gap-3 rounded-xl border border-ai-line bg-ai-soft/60 p-4 sm:flex-row sm:items-center sm:justify-between">
         <div className="flex items-start gap-3">
-          <Bot size={20} className="mt-0.5 shrink-0 text-accent" />
+          <AgenteAvatar tipo="fila" tamanho={32} />
           <div>
             <div className="font-medium">Deixe o agente trabalhar</div>
             <div className="text-sm text-ink-2">Ele trata ao vivo os próximos {LIMITE} casos da fila dele, mais urgentes primeiro, e você acompanha cada decisão.</div>
           </div>
         </div>
-        <button onClick={iniciar} className="btn btn-primary shrink-0 justify-center"><Play size={15} /> Iniciar piloto automático</button>
+        <button onClick={iniciar} className="btn btn-ai shrink-0 justify-center"><Play size={15} /> Iniciar piloto automático</button>
       </div>
       {casos && <PainelPiloto casos={casos} onFechar={() => setCasos(null)} />}
     </>

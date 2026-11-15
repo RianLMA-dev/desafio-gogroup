@@ -1,18 +1,10 @@
 import Link from "next/link";
-import { ArrowRight, Calculator, Bot, Factory, ListOrdered, Play, ShieldCheck } from "lucide-react";
+import { ArrowRight, Calculator, Factory, ListOrdered, Play, ShieldCheck } from "lucide-react";
 import { resumo, causas, robustez } from "@/lib/data";
 import { mil, n, reais, NIVEL } from "@/lib/format";
 import { BarrasCenarios, LinhaFilaRestante, Legenda } from "@/components/Graficos";
-
-function Tile({ rotulo, valor, detalhe, destaque }: { rotulo: string; valor: string; detalhe: string; destaque?: boolean }) {
-  return (
-    <div className="card p-5">
-      <div className="text-sm text-ink-2">{rotulo}</div>
-      <div className={`mt-2 text-3xl font-semibold tracking-tight ${destaque ? "text-accent-ink" : ""}`}>{valor}</div>
-      <div className="mt-1 text-sm text-muted">{detalhe}</div>
-    </div>
-  );
-}
+import Contador from "@/components/Contador";
+import AgenteAvatar from "@/components/AgenteAvatar";
 
 export default function VisaoGeral() {
   const r = resumo;
@@ -27,47 +19,56 @@ export default function VisaoGeral() {
 
   return (
     <div className="flex flex-col gap-8">
-      {/* Cabeçalho */}
-      <section>
-        <div className="text-xs font-medium uppercase tracking-[0.12em] text-muted">Visão geral · fila de 30/09/2026</div>
-        <h1 className="mt-3 max-w-3xl text-[28px] font-semibold leading-tight tracking-tight sm:text-[34px]">
-          Com o agente, a operação recupera <span className="text-accent-ink">{mil(r.economia_agente)}</span> desta fila
-          e zera as exceções em <span className="text-accent-ink">{c.agente.dias_para_zerar} dias úteis</span>, não {c.fifo.dias_para_zerar}.
-          {" "}Corrigindo 9 causas na origem, evita outros <span className="text-accent-ink">{mil(r.causas_custo_mensal)} por mês</span>.
-        </h1>
-        <p className="mt-3 max-w-3xl text-ink-2">
-          Hoje são {n(r.n_excecoes)} exceções abertas ({reais(r.valor_pedidos)} em pedidos), tratadas por ordem de chegada com capacidade
-          de 150 por dia. Sem tratamento, a perda esperada chega a {mil(r.perda_sem_tratar_20d)} em 4 semanas, e os 150 casos mais urgentes
-          esperariam, em média, {r.top150_espera_fifo.toFixed(0)} dias úteis na fila.
-        </p>
+      {/* Destaque */}
+      <section className="relative overflow-hidden rounded-2xl border border-line bg-surface p-6 sm:p-8">
+        <div aria-hidden className="pointer-events-none absolute -right-24 -top-24 h-72 w-72 rounded-full opacity-[0.16] blur-3xl" style={{ background: "linear-gradient(135deg, var(--accent), var(--ai))" }} />
+        <div className="relative grid grid-cols-1 gap-8 lg:grid-cols-[1.4fr_1fr] lg:items-end">
+          <div>
+            <div className="text-xs font-medium uppercase tracking-[0.12em] text-muted">Visão geral · fila de 30/09/2026</div>
+            <div className="mt-5 text-sm font-medium text-ink-2">Recuperado nesta fila com priorização e o Agente de Fila</div>
+            <div className="mt-1 text-[44px] font-semibold leading-none tracking-tight text-accent-ink sm:text-[64px]">
+              <Contador valor={r.economia_agente} formato="mil" />
+            </div>
+            <p className="mt-3 max-w-xl text-[15px] leading-relaxed text-ink-2">
+              {Math.floor(pctRecuperado * 100)}% da perda que dava para evitar. Hoje são {n(r.n_excecoes)} exceções ({reais(r.valor_pedidos)} em pedidos)
+              tratadas por ordem de chegada; sem tratamento, a perda chega a {mil(r.perda_sem_tratar_20d)} em 4 semanas.
+            </p>
+          </div>
+          <dl className="grid grid-cols-1 divide-y divide-line rounded-xl border border-line bg-surface/80 backdrop-blur sm:grid-cols-3 sm:divide-x sm:divide-y-0 lg:grid-cols-1 lg:divide-x-0 lg:divide-y">
+            <div className="px-4 py-3">
+              <dt className="text-xs text-ink-2">Fila zera em</dt>
+              <dd className="mt-0.5 text-2xl font-semibold tracking-tight"><Contador valor={c.agente.dias_para_zerar} /> dias úteis <span className="text-sm font-normal text-muted">(hoje: {c.fifo.dias_para_zerar})</span></dd>
+            </div>
+            <div className="px-4 py-3">
+              <dt className="text-xs text-ink-2">Tempo do time para tratar a fila</dt>
+              <dd className="mt-0.5 text-2xl font-semibold tracking-tight"><Contador valor={reducao * 100} formato="porcento_neg" /> <span className="text-sm font-normal text-muted">({n(horasHoje)} h → {n(horasAgente)} h)</span></dd>
+            </div>
+            <div className="px-4 py-3">
+              <dt className="text-xs text-ink-2">Evitável na origem, corrigindo 9 causas</dt>
+              <dd className="mt-0.5 text-2xl font-semibold tracking-tight text-accent-ink"><Contador valor={r.causas_custo_mensal} formato="mil" /><span className="text-base">/mês</span> <span className="text-sm font-normal text-muted">(≈ R$ {Math.round((r.causas_custo_mensal * 12) / 1000)} mil/ano)</span></dd>
+            </div>
+          </dl>
+        </div>
       </section>
 
       {/* Comece por aqui */}
-      <section className="card p-5">
+      <section>
         <h2 className="text-xs font-medium uppercase tracking-[0.12em] text-muted">Comece por aqui · 1 minuto</h2>
         <div className="mt-3 grid grid-cols-1 gap-3 md:grid-cols-3">
           {[
-            { href: "/fila", n: 1, icone: ListOrdered, titulo: "Veja a fila do dia", texto: "O que tratar hoje, em ordem de dinheiro em risco, e quem trata cada caso." },
-            { href: "/fila?abrir=EX0607", n: 2, icone: Play, titulo: "Rode o agente num pedido", texto: "Clique em “Rodar agente agora” e veja a IA investigar, decidir e escrever ao cliente." },
-            { href: "/processo#imp02", n: 3, icone: Factory, titulo: "Veja um problema de processo", texto: "Uma impressora gera metade das falhas. Abra o relatório que o agente escreveu." },
-          ].map(({ href, n: num, icone: Icone, titulo, texto }) => (
-            <Link key={href} href={href} className="group flex gap-3 rounded-xl border border-line p-4 transition-colors hover:border-accent hover:bg-accent-soft/40">
-              <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-accent text-sm font-semibold text-white">{num}</span>
+            { href: "/fila", n: 1, icone: ListOrdered, titulo: "Veja a fila do dia", texto: "O que tratar hoje, em ordem de dinheiro em risco, e quem trata cada caso.", ia: false },
+            { href: "/fila?abrir=EX0607", n: 2, icone: Play, titulo: "Rode o agente num pedido", texto: "Clique em “Rodar agente agora” e veja a IA investigar, decidir e escrever ao cliente.", ia: true },
+            { href: "/processo#imp02", n: 3, icone: Factory, titulo: "Veja um problema de processo", texto: "Uma impressora gera metade das falhas. Abra o relatório que o agente escreveu.", ia: false },
+          ].map(({ href, n: num, icone: Icone, titulo, texto, ia }) => (
+            <Link key={href} href={href} className={`card group flex gap-3 p-4 transition-all hover:-translate-y-0.5 hover:shadow-md ${ia ? "border-ai-line hover:border-ai" : "hover:border-accent"}`}>
+              <span className={`flex h-7 w-7 shrink-0 items-center justify-center rounded-full text-sm font-semibold text-white ${ia ? "bg-ai" : "bg-accent"}`}>{num}</span>
               <div>
-                <div className="flex items-center gap-1.5 font-medium"><Icone size={15} className="text-ink-2" />{titulo}<ArrowRight size={14} className="text-muted transition-transform group-hover:translate-x-0.5" /></div>
+                <div className="flex items-center gap-1.5 font-medium"><Icone size={15} className={ia ? "text-ai" : "text-ink-2"} />{titulo}<ArrowRight size={14} className="text-muted transition-transform group-hover:translate-x-0.5" /></div>
                 <p className="mt-1 text-sm text-ink-2">{texto}</p>
               </div>
             </Link>
           ))}
         </div>
-      </section>
-
-      {/* Tiles */}
-      <section className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
-        <Tile rotulo="Recuperado nesta fila" valor={mil(r.economia_agente)} detalhe={`${Math.floor(pctRecuperado * 100)}% da perda que dava para evitar`} destaque />
-        <Tile rotulo="Fila zera em" valor={`${c.agente.dias_para_zerar} dias úteis`} detalhe={`hoje: ${c.fifo.dias_para_zerar} dias úteis`} />
-        <Tile rotulo="Tempo do time" valor={`−${Math.round(reducao * 100)}%`} detalhe={`${n(horasHoje)} h → ${n(horasAgente)} h para tratar a fila`} />
-        <Tile rotulo="Evitável na origem, por mês" valor={mil(r.causas_custo_mensal)} detalhe={`≈ R$ ${Math.round((r.causas_custo_mensal * 12) / 1000)} mil por ano e ${Math.round(r.causas_horas_mes)} h do time por mês`} destaque />
       </section>
 
       {/* Cenários */}
@@ -99,21 +100,21 @@ export default function VisaoGeral() {
         <h2 className="font-semibold">Como funciona</h2>
         <div className="mt-5 grid grid-cols-1 gap-6 md:grid-cols-3">
           <div>
-            <div className="flex items-center gap-2 font-medium"><Calculator size={18} className="text-ink-2" /> Motor de cálculo</div>
+            <div className="flex items-center gap-2 font-medium"><span className="flex h-6 w-6 items-center justify-center rounded-[30%] bg-surface-2 text-ink-2"><Calculator size={14} /></span> Motor de cálculo</div>
             <p className="mt-2 text-sm leading-relaxed text-ink-2">
               Código, não IA. Calcula para cada exceção quanto dinheiro está em risco (cancelamento, reenvio, recompra perdida,
               contatos) e quanto esse risco cresce se ela esperar mais uma semana. Esse crescimento define a ordem da fila.
             </p>
           </div>
           <div>
-            <div className="flex items-center gap-2 font-medium"><Bot size={18} className="text-ink-2" /> Agente de Fila</div>
+            <div className="flex items-center gap-2 font-medium"><AgenteAvatar tipo="fila" tamanho={24} /> Agente de Fila</div>
             <p className="mt-2 text-sm leading-relaxed text-ink-2">
               Investiga cada caso e decide: resolve sozinho ({n(r.niveis.auto)}), prepara para aprovação em 1 clique ({n(r.niveis.aprovacao)})
               ou passa para uma pessoa ({n(r.niveis.humano)}): pedidos acima de R$ 200, clientes VIP, extravios e rupturas.
             </p>
           </div>
           <div>
-            <div className="flex items-center gap-2 font-medium"><Factory size={18} className="text-ink-2" /> Agente de Processo</div>
+            <div className="flex items-center gap-2 font-medium"><AgenteAvatar tipo="processo" tamanho={24} /> Agente de Processo</div>
             <p className="mt-2 text-sm leading-relaxed text-ink-2">
               Procura padrões na fila inteira — máquina, turno, lote, transportadora — e escreve relatórios de incidente com evidência,
               custo e ação. O que ele descobre muda a ação do Agente de Fila.

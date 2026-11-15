@@ -1,10 +1,11 @@
 "use client";
 import { useEffect, useState } from "react";
 import Link from "next/link";
-import { X, Crown, Sparkles, AlertTriangle, Factory, Play } from "lucide-react";
+import { X, Crown, AlertTriangle, Factory, Play } from "lucide-react";
 import type { Excecao } from "@/lib/data";
 import { reais, reaisC, data, NIVEL } from "@/lib/format";
 import CelularAgente from "./CelularAgente";
+import AgenteAvatar from "./AgenteAvatar";
 
 type Detalhe = Excecao & { causas_titulos: { id: string; titulo: string }[] };
 
@@ -67,14 +68,14 @@ export default function DetalhePainel({ id, onFechar }: { id: string; onFechar: 
         {!e ? <div className="p-5 text-sm text-muted">Carregando…</div> : (
           <>
             {/* Decisão do agente */}
-            <section className="mx-5 mb-4 rounded-xl border border-line bg-surface-2 p-4">
+            <section className="mx-5 mb-4 rounded-xl border border-ai-line bg-ai-soft/50 p-4">
               <div className="flex items-center justify-between gap-2">
                 <span className="chip border border-line bg-surface text-ink-2"><span className="h-2 w-2 rounded-full" style={{ background: NIVEL[e.nivel].cor }} />{NIVEL[e.nivel].rotulo}</span>
-                {e.nivel !== "humano" && <span className="flex items-center gap-1 text-xs text-accent-ink"><Sparkles size={12} /> decisão do agente</span>}
+                <span className="flex items-center gap-1.5 text-xs font-medium text-ai-strong"><AgenteAvatar tipo="fila" tamanho={18} /> Agente de Fila</span>
               </div>
               <div className="mt-3 font-medium">{e.acao_texto}</div>
               <div className="mt-1 text-sm text-ink-2">{e.motivo_nivel}.</div>
-              <button onClick={() => setAgente(Date.now())} className="btn btn-primary mt-4 w-full justify-center">
+              <button onClick={() => setAgente(Date.now())} className="btn btn-ai mt-4 w-full justify-center">
                 <Play size={15} /> Rodar agente agora
               </button>
             </section>
@@ -113,7 +114,7 @@ export default function DetalhePainel({ id, onFechar }: { id: string; onFechar: 
               <Bloco titulo="Ligado a problema de processo">
                 {e.causas_titulos.map((c) => (
                   <Link key={c.id} href={`/processo#${c.id}`} className="flex items-center gap-2 rounded-lg border border-line px-3 py-2 text-sm hover:bg-surface-2">
-                    <Factory size={15} className="text-accent" /> {c.titulo}
+                    <Factory size={15} className="text-ai" /> {c.titulo}
                   </Link>
                 ))}
               </Bloco>
