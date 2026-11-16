@@ -165,7 +165,7 @@ export default function PilotoAutomatico({ linhas }: { linhas: LinhaFila[] }) {
           <AgenteAvatar tipo="fila" tamanho={32} />
           <div>
             <div className="font-medium">Deixe o agente trabalhar</div>
-            <div className="text-sm text-ink-2">Ele trata ao vivo os próximos {LIMITE} casos da fila dele, mais urgentes primeiro, e você acompanha cada decisão.</div>
+            <div className="text-sm text-ink-2">Ele trata ao vivo os próximos {LIMITE} casos dele, e você acompanha cada decisão.</div>
           </div>
         </div>
         <button onClick={iniciar} className="btn btn-ai shrink-0 justify-center"><Play size={15} /> Iniciar piloto automático</button>

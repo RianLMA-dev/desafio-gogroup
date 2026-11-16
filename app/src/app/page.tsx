@@ -2,7 +2,7 @@ import Link from "next/link";
 import { ArrowRight, Calculator, Factory, ListOrdered, Play, ShieldCheck } from "lucide-react";
 import { resumo, causas, robustez } from "@/lib/data";
 import { mil, n, reais, NIVEL } from "@/lib/format";
-import { BarrasCenarios, LinhaFilaRestante, Legenda } from "@/components/Graficos";
+import { BarrasCenarios, LinhaFilaRestante, Legenda, BarrasRobustez } from "@/components/Graficos";
 import Contador from "@/components/Contador";
 import AgenteAvatar from "@/components/AgenteAvatar";
 
@@ -29,10 +29,12 @@ export default function VisaoGeral() {
             <div className="mt-1 text-[44px] font-semibold leading-none tracking-tight text-accent-ink sm:text-[64px]">
               <Contador valor={r.economia_agente} formato="mil" />
             </div>
-            <p className="mt-3 max-w-xl text-[15px] leading-relaxed text-ink-2">
-              {Math.floor(pctRecuperado * 100)}% da perda que dava para evitar. Hoje são {n(r.n_excecoes)} exceções ({reais(r.valor_pedidos)} em pedidos)
-              tratadas por ordem de chegada; sem tratamento, a perda chega a {mil(r.perda_sem_tratar_20d)} em 4 semanas.
-            </p>
+            <p className="mt-3 text-[15px] text-ink-2"><b className="font-semibold text-ink">{Math.floor(pctRecuperado * 100)}%</b> da perda que dava para evitar</p>
+            <div className="mt-4 flex flex-wrap gap-2 text-xs text-ink-2">
+              <span className="chip border border-line bg-surface">{n(r.n_excecoes)} exceções abertas</span>
+              <span className="chip border border-line bg-surface">{mil(r.valor_pedidos)} em pedidos</span>
+              <span className="chip border border-line bg-surface">sem tratar: {mil(r.perda_sem_tratar_20d)} perdidos em 4 semanas</span>
+            </div>
           </div>
           <dl className="grid grid-cols-1 divide-y divide-line rounded-xl border border-line bg-surface/80 backdrop-blur sm:grid-cols-3 sm:divide-x sm:divide-y-0 lg:grid-cols-1 lg:divide-x-0 lg:divide-y">
             <div className="px-4 py-3">
@@ -75,21 +77,15 @@ export default function VisaoGeral() {
       <section className="grid grid-cols-1 gap-4 lg:grid-cols-5">
         <div className="card p-5 lg:col-span-2">
           <h2 className="font-semibold">Perda evitável por estratégia</h2>
-          <p className="mt-1 text-sm text-ink-2">Mesma fila, mesma capacidade do time. Só muda a ordem e quem trata.</p>
+          <p className="mt-1 text-sm text-ink-2">Mesma fila e mesmo time; muda a ordem e quem trata.</p>
           <div className="mt-4">
             <BarrasCenarios dados={(["fifo", "prioridade", "agente"] as const).map((id) => ({ id, evitavel: c[id].evitavel }))} />
           </div>
-          <p className="mt-3 border-t border-line pt-3 text-xs leading-relaxed text-muted">
-            Outros {mil(r.perda_piso)} já estão comprometidos (dano que aconteceu antes de hoje) e nenhuma estratégia recupera.
-            A perda evitável é o que ainda cresce a cada dia de espera.
-          </p>
+          <p className="mt-3 border-t border-line pt-3 text-xs text-muted">Não inclui {mil(r.perda_piso)} já perdidos antes de hoje.</p>
         </div>
         <div className="card p-5 lg:col-span-3">
           <h2 className="font-semibold">Exceções ainda na fila, por dia útil</h2>
-          <p className="mt-1 text-sm text-ink-2">
-            O agente resolve {n(r.niveis.auto)} casos sozinho no primeiro dia; o time foca no resto. Sem o agente, as duas ordens
-            esvaziam a fila no mesmo ritmo: muda só quem é atendido primeiro.
-          </p>
+          <p className="mt-1 text-sm text-ink-2">O agente resolve {n(r.niveis.auto)} casos já no primeiro dia.</p>
           <div className="mt-3"><Legenda /></div>
           <div className="mt-2"><LinhaFilaRestante curvas={r.curvas} /></div>
         </div>
@@ -98,33 +94,33 @@ export default function VisaoGeral() {
       {/* Como funciona */}
       <section className="card p-6">
         <h2 className="font-semibold">Como funciona</h2>
-        <div className="mt-5 grid grid-cols-1 gap-6 md:grid-cols-3">
-          <div>
-            <div className="flex items-center gap-2 font-medium"><span className="flex h-6 w-6 items-center justify-center rounded-[30%] bg-surface-2 text-ink-2"><Calculator size={14} /></span> Motor de cálculo</div>
-            <p className="mt-2 text-sm leading-relaxed text-ink-2">
-              Código, não IA. Calcula para cada exceção quanto dinheiro está em risco (cancelamento, reenvio, recompra perdida,
-              contatos) e quanto esse risco cresce se ela esperar mais uma semana. Esse crescimento define a ordem da fila.
-            </p>
+        <div className="mt-5 grid grid-cols-1 items-stretch gap-2 md:grid-cols-[1fr_auto_1.3fr_auto_1fr]">
+          <div className="rounded-xl border border-line bg-surface-2 p-4">
+            <div className="flex items-center gap-2 font-medium"><span className="flex h-6 w-6 items-center justify-center rounded-[30%] bg-surface text-ink-2"><Calculator size={14} /></span> Motor de cálculo</div>
+            <div className="mt-1 text-[11px] font-medium uppercase tracking-wide text-muted">código</div>
+            <p className="mt-2 text-sm text-ink-2">Ordena a fila pelo dinheiro que se perde se o caso esperar.</p>
           </div>
-          <div>
+          <div className="flex items-center justify-center text-muted" aria-hidden><ArrowRight size={18} className="rotate-90 md:rotate-0" /></div>
+          <div className="rounded-xl border border-ai-line bg-ai-soft/50 p-4">
             <div className="flex items-center gap-2 font-medium"><AgenteAvatar tipo="fila" tamanho={24} /> Agente de Fila</div>
-            <p className="mt-2 text-sm leading-relaxed text-ink-2">
-              Investiga cada caso e decide: resolve sozinho ({n(r.niveis.auto)}), prepara para aprovação em 1 clique ({n(r.niveis.aprovacao)})
-              ou passa para uma pessoa ({n(r.niveis.humano)}): pedidos acima de R$ 200, clientes VIP, extravios e rupturas.
-            </p>
+            <div className="mt-1 text-[11px] font-medium uppercase tracking-wide text-ai-strong">IA · investiga e age</div>
+            <div className="mt-3 flex h-2.5 gap-[2px] overflow-hidden rounded">
+              {(["auto", "aprovacao", "humano"] as const).map((k) => <div key={k} style={{ flex: r.niveis[k], background: NIVEL[k].cor }} />)}
+            </div>
+            <div className="mt-2 grid grid-cols-3 gap-2 text-xs">
+              {(["auto", "aprovacao", "humano"] as const).map((k) => (
+                <div key={k}><div className="tabular text-base font-semibold text-ink">{n(r.niveis[k])}</div><div className="text-ink-2">{NIVEL[k].rotulo.toLowerCase()}</div></div>
+              ))}
+            </div>
           </div>
-          <div>
+          <div className="flex items-center justify-center text-muted" aria-hidden><ArrowRight size={18} className="-rotate-90 md:rotate-180" /></div>
+          <div className="rounded-xl border border-ai-line bg-ai-soft/50 p-4">
             <div className="flex items-center gap-2 font-medium"><AgenteAvatar tipo="processo" tamanho={24} /> Agente de Processo</div>
-            <p className="mt-2 text-sm leading-relaxed text-ink-2">
-              Procura padrões na fila inteira — máquina, turno, lote, transportadora — e escreve relatórios de incidente com evidência,
-              custo e ação. O que ele descobre muda a ação do Agente de Fila.
-            </p>
+            <div className="mt-1 text-[11px] font-medium uppercase tracking-wide text-ai-strong">IA · acha a causa</div>
+            <p className="mt-2 text-sm text-ink-2">Encontra padrões na fila e orienta o Agente de Fila.</p>
           </div>
         </div>
-        <p className="mt-5 border-t border-line pt-4 text-xs leading-relaxed text-muted">
-          A fila foi processada em lote pelos agentes (como seria de madrugada em produção). Em cada pedido e incidente, o botão
-          “Rodar agente agora” executa o agente ao vivo. As ações são simuladas: em produção, seriam integrações com WhatsApp, transportadoras e ERP.
-        </p>
+        <p className="mt-4 text-xs text-muted">Pessoa: pedido acima de R$ 200, cliente VIP, extravio ou ruptura. Ações simuladas; em produção, integrações com WhatsApp, transportadoras e ERP.</p>
       </section>
 
       {/* Por tipo + processo */}
@@ -164,11 +160,7 @@ export default function VisaoGeral() {
           </table>
         </div>
         <div className="card flex flex-col p-5 lg:col-span-2">
-          <h2 className="font-semibold">Problemas de processo</h2>
-          <p className="mt-1 text-sm text-ink-2">
-            Boa parte das exceções vem de poucas causas na origem. Elas custam <b className="text-ink">{mil(r.causas_custo_mensal)}/mês</b> e
-            <b className="text-ink"> {Math.round(r.causas_horas_mes)} horas</b> do time por mês.
-          </p>
+          <h2 className="font-semibold">Maiores causas na origem</h2>
           <ul className="mt-4 flex flex-col gap-3">
             {topCausas.map((x) => (
               <li key={x.id} className="flex items-start justify-between gap-3 border-b border-line pb-3 last:border-0">
@@ -186,40 +178,15 @@ export default function VisaoGeral() {
 
       {/* Robustez */}
       <section className="card p-5">
-        <h2 className="flex items-center gap-2 font-semibold"><ShieldCheck size={18} className="text-ink-2" /> A conclusão se mantém se as premissas estiverem erradas?</h2>
-        <p className="mt-1 max-w-3xl text-sm text-ink-2">
-          Rodamos o modelo inteiro de novo variando, uma de cada vez, as premissas mais incertas, e depois todas juntas no pior sentido.
-          Em todos os casos, priorizar e usar o agente recupera mais de 90% da perda evitável e zera a fila em menos da metade do tempo.
-        </p>
-        <div className="mt-4 overflow-x-auto">
-          <table className="w-full min-w-[560px] text-sm">
-            <thead>
-              <tr className="border-b border-line text-left text-xs text-muted">
-                <th className="py-2 font-normal">Cenário</th>
-                <th className="py-2 text-right font-normal">Recuperado com o agente</th>
-                <th className="py-2 text-right font-normal">% do evitável</th>
-                <th className="py-2 text-right font-normal">Fila zera (vs. hoje)</th>
-              </tr>
-            </thead>
-            <tbody>
-              {robustez.map((x) => (
-                <tr key={x.id} className={`border-b border-line last:border-0 ${x.id === "base" || x.id === "pessimista" ? "font-medium" : ""}`}>
-                  <td className="py-2 pr-4">{x.rotulo}</td>
-                  <td className="tabular py-2 text-right">{mil(x.economia_agente)}</td>
-                  <td className="tabular py-2 text-right">{x.pct_recuperado !== null ? `${Math.floor(x.pct_recuperado * 100)}%` : "—"}</td>
-                  <td className="tabular py-2 text-right text-ink-2">{x.dias_agente} dias ({x.dias_fifo})</td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
+        <h2 className="flex items-center gap-2 font-semibold"><ShieldCheck size={18} className="text-ink-2" /> E se as premissas estiverem erradas?</h2>
+        <p className="mt-1 text-sm text-ink-2">Mesmo com todas no pior sentido, a solução recupera mais de 90% do evitável.</p>
+        <div className="mt-4"><BarrasRobustez dados={robustez} /></div>
       </section>
 
       {/* Premissas */}
       <section className="card p-5">
         <details>
           <summary className="cursor-pointer font-semibold">Premissas do cálculo ({r.premissas.length})</summary>
-          <p className="mt-2 text-sm text-ink-2">Regras que não estão nos parâmetros do negócio e foram definidas para fechar o cálculo.</p>
           <ol className="mt-3 list-decimal space-y-2 pl-5 text-sm leading-relaxed text-ink-2">
             {r.premissas.map((p) => <li key={p.id}>{p.texto}</li>)}
           </ol>

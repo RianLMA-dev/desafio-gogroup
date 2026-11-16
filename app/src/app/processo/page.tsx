@@ -5,6 +5,10 @@ import { causas, resumo, relatorios } from "@/lib/data";
 import { mil, n } from "@/lib/format";
 import { GraficoCausa } from "@/components/Graficos";
 
+const SELO = /\s*\((Agente de Fila já faz|pessoa decide)\)\.?$/;
+const temSelo = (a: string) => /Agente de Fila já faz/.test(a);
+const semSelo = (a: string) => a.replace(SELO, ".").replace(/\.\.$/, ".");
+
 export default function ProcessoPage() {
   const ativas = causas.filter((c) => !c.monitorar).sort((a, b) => b.custo_mensal - a.custo_mensal || b.n_casos - a.n_casos);
   const obs = causas.filter((c) => c.monitorar);
@@ -17,11 +21,12 @@ export default function ProcessoPage() {
         <h1 className="mt-3 max-w-3xl text-[28px] font-semibold leading-tight tracking-tight">
           {ativas.length} causas na origem geraram {n(casosLigados)} exceções evitáveis em 2 meses e custam {mil(resumo.causas_custo_mensal)} por mês
         </h1>
-        <p className="mt-2 max-w-3xl text-ink-2">
-          Tratar caso a caso não resolve: elas voltam todo dia. O Agente de Processo compara cada tipo de exceção com cada máquina, turno, lote,
-          transportadora e região, e só aponta o que está muito acima do normal, é estatisticamente significativo e tem uma explicação operacional.
-          O custo considera só o excesso acima do normal, já descontado o que aconteceria de qualquer forma.
-        </p>
+        <p className="mt-1 text-ink-2">Tratar caso a caso não resolve: elas voltam todo dia.</p>
+        <details className="mt-2 max-w-3xl text-sm text-ink-2">
+          <summary className="cursor-pointer text-xs font-medium text-ai-strong">Como o Agente de Processo encontra as causas</summary>
+          <p className="mt-2">Compara cada tipo de exceção com cada máquina, turno, lote, transportadora e região. Só aponta o que está muito acima do normal,
+          é estatisticamente significativo e tem explicação operacional. O custo conta só o excesso acima do normal.</p>
+        </details>
       </section>
 
       <MapaCausas causas={causas} />
@@ -42,33 +47,37 @@ export default function ProcessoPage() {
               </div>
             </div>
 
-            <div className="mt-5 grid grid-cols-1 gap-6 lg:grid-cols-2">
-              <div>
-                <h3 className="text-sm font-medium">Evidência</h3>
-                <ul className="mt-2 flex list-disc flex-col gap-1.5 pl-5 text-sm leading-relaxed text-ink-2">
-                  {c.evidencia.map((ev) => <li key={ev}>{ev}</li>)}
-                </ul>
-                <h3 className="mt-4 text-sm font-medium">Causa provável</h3>
-                <p className="mt-1 text-sm leading-relaxed text-ink-2">{c.causa_provavel}</p>
-              </div>
-              {c.grafico && (
+            <div className="mt-5 grid grid-cols-1 gap-5 lg:grid-cols-[1.3fr_1fr]">
+              {c.grafico ? (
                 <div>
-                  <h3 className="text-sm font-medium">{c.grafico.titulo}</h3>
+                  <h3 className="text-xs font-medium uppercase tracking-wide text-muted">{c.grafico.titulo}</h3>
                   <div className="mt-2"><GraficoCausa g={c.grafico} /></div>
                 </div>
+              ) : (
+                <ul className="flex list-disc flex-col gap-1.5 pl-5 text-sm text-ink-2">{c.evidencia.map((ev) => <li key={ev}>{ev}</li>)}</ul>
               )}
+              <div className="flex flex-col gap-3 rounded-xl border border-line bg-surface-2 p-4">
+                <h3 className="flex items-center gap-2 text-xs font-medium uppercase tracking-wide text-muted"><Wrench size={13} /> Ação principal</h3>
+                <p className="font-medium leading-snug">{semSelo(c.acoes[0])}</p>
+                <div className="flex items-center gap-2 text-xs text-ink-2"><User size={13} /> {c.responsavel}</div>
+                <div className="mt-auto pt-1"><RelatorioIncidente id={c.id} salvo={relatorios[c.id]} /></div>
+              </div>
             </div>
 
-            <div className="mt-5 flex flex-col gap-4 border-t border-line pt-4 lg:flex-row lg:items-end lg:justify-between">
-              <div>
-                <h3 className="flex items-center gap-2 text-sm font-medium"><Wrench size={15} className="text-ink-2" /> O que fazer</h3>
-                <ol className="mt-2 flex list-decimal flex-col gap-1 pl-5 text-sm text-ink-2">
-                  {c.acoes.map((a) => <li key={a}>{a}</li>)}
+            <details className="mt-4 border-t border-line pt-3">
+              <summary className="cursor-pointer text-sm font-medium text-ink-2">Ver evidência e plano completo</summary>
+              <div className="mt-3 grid grid-cols-1 gap-5 text-sm text-ink-2 lg:grid-cols-2">
+                <div>
+                  {c.grafico && <ul className="flex list-disc flex-col gap-1.5 pl-5">{c.evidencia.map((ev) => <li key={ev}>{ev}</li>)}</ul>}
+                  <p className={c.grafico ? "mt-3" : ""}><b className="font-medium text-ink">Causa provável:</b> {c.causa_provavel}</p>
+                </div>
+                <ol className="flex list-decimal flex-col gap-1.5 pl-5">
+                  {c.acoes.map((a) => (
+                    <li key={a}>{semSelo(a)}{temSelo(a) && <span className="chip ml-2 border border-ai-line bg-ai-soft px-2 py-0 text-[11px] text-ai-strong">o agente já faz</span>}</li>
+                  ))}
                 </ol>
-                <div className="mt-3 flex items-center gap-2 text-xs text-muted"><User size={13} /> Responsável: {c.responsavel}</div>
               </div>
-              <RelatorioIncidente id={c.id} salvo={relatorios[c.id]} />
-            </div>
+            </details>
           </article>
         ))}
       </div>
@@ -82,10 +91,8 @@ export default function ProcessoPage() {
               <p className="mt-1 text-ink-2">{c.resumo}</p>
             </div>
           ))}
-          <p className="mt-4 border-t border-line pt-3 text-xs leading-relaxed text-muted">
-            Sem causa na origem: endereço divergente, devolução pela transportadora, pagamento pendente e extravio se distribuem de forma
-            uniforme entre CDs, turnos, máquinas, lotes, marcas e clientes. Os “sinais” que apareceram eram efeito de composição
-            (só temos pedidos com exceção) ou acaso de muitas comparações. Esses casos são tratados um a um pelo Agente de Fila.
+          <p className="mt-4 border-t border-line pt-3 text-xs text-muted">
+            Sem causa na origem: endereço divergente, devolução, pagamento pendente e extravio se espalham por igual. São tratados caso a caso pelo Agente de Fila.
           </p>
         </section>
       )}

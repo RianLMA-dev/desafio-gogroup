@@ -32,7 +32,7 @@ export default function MapaCausas({ causas }: { causas: Causa[] }) {
   return (
     <section className="card p-5">
       <h2 className="font-semibold">Onde os problemas nascem</h2>
-      <p className="mt-1 text-sm text-ink-2">O caminho de um pedido, da compra até a tratativa da exceção. Cada causa aparece na etapa em que acontece; clique para ver a evidência.</p>
+      <p className="mt-1 text-sm text-ink-2">Cada causa na etapa do pedido em que acontece. Clique para ver a evidência.</p>
       <div className="mt-5 flex flex-col items-stretch gap-1 lg:flex-row lg:items-stretch lg:gap-0">
         {ETAPAS.map((etapa, i) => {
           const Icone = etapa.icone;

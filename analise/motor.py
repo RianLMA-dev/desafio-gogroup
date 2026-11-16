@@ -211,7 +211,7 @@ def acao_padrao(r):
     if t == "vazamento_produto" and r["lote_produto"] == "L2607-B" and r["sku"] == "APC-1067":
         return "reenvio_outro_lote", "Reenviar de outro lote (L2607-B tem defeito)"
     if t in ("avaria_transporte", "vazamento_produto", "item_faltante"):
-        return "reenvio_com_foto", "Pedir foto e reenviar sem custo (política)"
+        return "reenvio_com_foto", "Pedir foto e reenviar sem custo"
     if t == "devolvido_transportadora":
         return "reenvio_endereco", "Confirmar endereço e reenviar"
     if t == "extravio":

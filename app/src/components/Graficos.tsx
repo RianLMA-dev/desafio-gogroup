@@ -134,3 +134,52 @@ export function GraficoCausa({ g }: { g: { tipo: "barras" | "linha"; dados: { gr
     </ResponsiveContainer>
   );
 }
+
+/** Robustez: quanto o agente recupera em cada cenário de premissas (barras horizontais). */
+export function BarrasRobustez({ dados }: { dados: { id: string; rotulo: string; economia_agente: number; pct_recuperado: number | null; dias_agente: number; dias_fifo: number }[] }) {
+  const CURTO: Record<string, string> = {
+    base: "Premissas do modelo", mal_lento: "Cliente tolera mais espera", mal_rapido: "Cliente tolera menos espera",
+    cancel_menos: "Cancelamentos −50%", cancel_mais: "Cancelamentos +50%", recompra_menos: "Recompra pela metade",
+    recompra_mais: "Recompra em dobro", sem_contatos: "Cliente não liga no atendimento", aprovacao_5min: "Aprovação leva 5 min",
+    capacidade_menor: "Time trata 120/dia, não 150", pessimista: "Tudo junto, no pior sentido",
+  };
+  const linhas = dados.map((d) => ({ ...d, curto: CURTO[d.id] ?? d.rotulo }));
+  const cor = (id: string) => (id === "base" ? "var(--accent)" : id === "pessimista" ? "var(--serious)" : "var(--line-strong)");
+  const max = Math.max(...linhas.map((l) => l.economia_agente));
+  return (
+    <>
+    {/* celular: lista compacta, rótulo em cima e barra embaixo */}
+    <ul className="flex flex-col gap-2.5 sm:hidden">
+      {linhas.map((l) => (
+        <li key={l.id}>
+          <div className="flex justify-between gap-2 text-xs"><span className="text-ink-2">{l.curto}</span>
+            <span className="tabular"><b className="font-semibold">{brl(l.economia_agente)}</b> · {l.pct_recuperado !== null ? Math.floor(l.pct_recuperado * 100) : "—"}%</span></div>
+          <div className="mt-1 h-2 rounded bg-surface-2"><div className="h-2 rounded" style={{ width: `${(l.economia_agente / max) * 100}%`, background: cor(l.id) }} /></div>
+        </li>
+      ))}
+    </ul>
+    <div className="hidden sm:block">
+    <ResponsiveContainer width="100%" height={linhas.length * 30 + 10}>
+      <BarChart data={linhas} layout="vertical" margin={{ left: 0, right: 120, top: 0, bottom: 0 }} barCategoryGap={6}>
+        <XAxis type="number" hide domain={[0, "dataMax"]} />
+        <YAxis type="category" dataKey="curto" width={225} tick={{ ...eixo, fill: "var(--ink-2)" }} axisLine={false} tickLine={false} interval={0} />
+        <Tooltip cursor={{ fill: "var(--surface-2)" }} content={({ active, payload }) =>
+          active && payload?.length ? (
+            <div className="rounded-lg border border-line bg-surface px-3 py-2 text-xs shadow-md">
+              <div className="font-medium">{payload[0].payload.rotulo}</div>
+              <div className="text-ink-2">Recupera <b className="text-ink">{brl(payload[0].payload.economia_agente)}</b> · fila zera em {payload[0].payload.dias_agente} dias (hoje: {payload[0].payload.dias_fifo})</div>
+            </div>) : null} />
+        <Bar dataKey="economia_agente" radius={[0, 4, 4, 0]} isAnimationActive={false}>
+          {linhas.map((l) => <Cell key={l.id} fill={cor(l.id)} />)}
+          <LabelList dataKey="economia_agente" content={(p: { x?: number | string; y?: number | string; width?: number | string; height?: number | string; index?: number }) => {
+            const l = linhas[p.index ?? 0];
+            const x = Number(p.x ?? 0) + Number(p.width ?? 0) + 6, y = Number(p.y ?? 0) + Number(p.height ?? 0) / 2;
+            return <text x={x} y={y} dominantBaseline="middle" fontSize={12} fill="var(--ink-2)"><tspan fontWeight={600} fill="var(--ink)">{brl(l.economia_agente)}</tspan> · {l.pct_recuperado !== null ? Math.floor(l.pct_recuperado * 100) : "—"}%</text>;
+          }} />
+        </Bar>
+      </BarChart>
+    </ResponsiveContainer>
+    </div>
+    </>
+  );
+}
