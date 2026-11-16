@@ -94,33 +94,33 @@ export default function VisaoGeral() {
       {/* Como funciona */}
       <section className="card p-6">
         <h2 className="font-semibold">Como funciona</h2>
-        <div className="mt-5 grid grid-cols-1 items-stretch gap-2 md:grid-cols-[1fr_auto_1.3fr_auto_1fr]">
-          <div className="rounded-xl border border-line bg-surface-2 p-4">
-            <div className="flex items-center gap-2 font-medium"><span className="flex h-6 w-6 items-center justify-center rounded-[30%] bg-surface text-ink-2"><Calculator size={14} /></span> Motor de cálculo</div>
-            <div className="mt-1 text-[11px] font-medium uppercase tracking-wide text-muted">código</div>
-            <p className="mt-2 text-sm text-ink-2">Ordena a fila pelo dinheiro que se perde se o caso esperar.</p>
+        <div className="mt-5 grid grid-cols-1 gap-6 md:grid-cols-3">
+          <div>
+            <div className="flex items-center gap-2 font-medium"><span className="flex h-6 w-6 items-center justify-center rounded-[30%] bg-surface-2 text-ink-2"><Calculator size={14} /></span> Motor de cálculo</div>
+            <p className="mt-2 text-sm leading-relaxed text-ink-2">
+              Código, não IA. Calcula para cada exceção quanto dinheiro está em risco (cancelamento, reenvio, recompra perdida,
+              contatos) e quanto esse risco cresce se ela esperar mais uma semana. Esse crescimento define a ordem da fila.
+            </p>
           </div>
-          <div className="flex items-center justify-center text-muted" aria-hidden><ArrowRight size={18} className="rotate-90 md:rotate-0" /></div>
-          <div className="rounded-xl border border-ai-line bg-ai-soft/50 p-4">
+          <div>
             <div className="flex items-center gap-2 font-medium"><AgenteAvatar tipo="fila" tamanho={24} /> Agente de Fila</div>
-            <div className="mt-1 text-[11px] font-medium uppercase tracking-wide text-ai-strong">IA · investiga e age</div>
-            <div className="mt-3 flex h-2.5 gap-[2px] overflow-hidden rounded">
-              {(["auto", "aprovacao", "humano"] as const).map((k) => <div key={k} style={{ flex: r.niveis[k], background: NIVEL[k].cor }} />)}
-            </div>
-            <div className="mt-2 grid grid-cols-3 gap-2 text-xs">
-              {(["auto", "aprovacao", "humano"] as const).map((k) => (
-                <div key={k}><div className="tabular text-base font-semibold text-ink">{n(r.niveis[k])}</div><div className="text-ink-2">{NIVEL[k].rotulo.toLowerCase()}</div></div>
-              ))}
-            </div>
+            <p className="mt-2 text-sm leading-relaxed text-ink-2">
+              Investiga cada caso e decide: resolve sozinho ({n(r.niveis.auto)}), prepara para aprovação em 1 clique ({n(r.niveis.aprovacao)})
+              ou passa para uma pessoa ({n(r.niveis.humano)}): pedidos acima de R$ 200, clientes VIP, extravios e rupturas.
+            </p>
           </div>
-          <div className="flex items-center justify-center text-muted" aria-hidden><ArrowRight size={18} className="-rotate-90 md:rotate-180" /></div>
-          <div className="rounded-xl border border-ai-line bg-ai-soft/50 p-4">
+          <div>
             <div className="flex items-center gap-2 font-medium"><AgenteAvatar tipo="processo" tamanho={24} /> Agente de Processo</div>
-            <div className="mt-1 text-[11px] font-medium uppercase tracking-wide text-ai-strong">IA · acha a causa</div>
-            <p className="mt-2 text-sm text-ink-2">Encontra padrões na fila e orienta o Agente de Fila.</p>
+            <p className="mt-2 text-sm leading-relaxed text-ink-2">
+              Procura padrões na fila inteira — máquina, turno, lote, transportadora — e escreve relatórios de incidente com evidência,
+              custo e ação. O que ele descobre muda a ação do Agente de Fila.
+            </p>
           </div>
         </div>
-        <p className="mt-4 text-xs text-muted">Pessoa: pedido acima de R$ 200, cliente VIP, extravio ou ruptura. Ações simuladas; em produção, integrações com WhatsApp, transportadoras e ERP.</p>
+        <p className="mt-5 border-t border-line pt-4 text-xs leading-relaxed text-muted">
+          A fila foi processada em lote pelos agentes (como seria de madrugada em produção). Em cada pedido e incidente, o botão
+          “Rodar agente agora” executa o agente ao vivo. As ações são simuladas: em produção, seriam integrações com WhatsApp, transportadoras e ERP.
+        </p>
       </section>
 
       {/* Por tipo + processo */}
