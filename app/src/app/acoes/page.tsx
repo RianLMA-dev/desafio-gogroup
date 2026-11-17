@@ -55,6 +55,13 @@ export default function AcoesPage() {
               <div className="mt-1 text-sm text-ink-2">limite de R$ 200, cliente VIP, ação compatível com o tipo, lote com defeito, falso atraso, mensagem sem dados inventados</div>
             </div>
           </div>
+          {divergentes.length === 0 && (
+            <details className="mt-3 text-xs leading-relaxed text-muted">
+              <summary className="cursor-pointer">Como chegamos a esse número</summary>
+              Na primeira rodada foram 89% (80 de 90). Todas as divergências eram devoluções em que a IA abria chamado na transportadora,
+              mas o pedido devolvido já voltou ao CD: a política permitia uma ação sem sentido. Corrigimos a política e reprocessamos.
+            </details>
+          )}
           {divergentes.length > 0 && (
             <details className="mt-3 text-xs leading-relaxed text-muted">
               <summary className="cursor-pointer">Ver as {divergentes.length} divergências</summary>

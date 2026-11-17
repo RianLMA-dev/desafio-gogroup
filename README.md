@@ -24,7 +24,7 @@ Além disso, **9 causas na origem** geram exceções que voltam todo dia e custa
 2. **Clique em "Rode o agente num pedido"** (passo 2 do "Comece por aqui") e depois em **Rodar agente agora**. O Agente de Fila investiga o pedido com ferramentas, mostra o que descobriu, decide dentro da política e escreve ao cliente. Depois de enviada, clique em **Simular resposta do cliente**.
 3. **Na Fila do dia, clique em Iniciar piloto automático** e veja o agente tratar 10 casos seguidos.
 4. **Em Problemas de processo**, veja o mapa de onde cada causa nasce e abra um **relatório de incidente** escrito pelo Agente de Processo.
-5. **Em Ações do agente**, veja a qualidade medida (IA de acordo com a política em 93% dos casos) e aprove ou rejeite reenvios.
+5. **Em Ações do agente**, veja a qualidade medida em 90 casos e aprove ou rejeite reenvios.
 
 | O agente investigando e conversando | O piloto automático |
 |---|---|
@@ -98,7 +98,11 @@ O valor em reais muda com as premissas; a conclusão — priorizar e automatizar
 
 ## Qualidade do agente
 
-Os números usam a política do agente para dizer quem trata cada caso. Para conferir, comparamos com o que a IA decide investigando sozinha: nos 30 casos do lote, **a IA chegou ao mesmo nível de tratamento que a política em 28 (93%)**. As 2 divergências são devoluções em que a IA preferiu acionar a transportadora (sem custo) antes de reenviar. Durante o desenvolvimento, as saídas foram revisadas uma a uma; erros encontrados (endereço inventado, previsão com data passada, ação errada para atraso real) viraram regras verificadas em código.
+Os números usam a política do agente para dizer quem trata cada caso. Para conferir, comparamos com o que a IA decide investigando sozinha, em 90 casos do lote (30 de cada nível), todos revisados um a um.
+
+- **Primeira rodada: 89% (80 de 90)** no mesmo nível que a política. Todas as 10 divergências eram devoluções em que a IA abria chamado na transportadora — mas o pedido devolvido já voltou ao CD, então a ação não fazia sentido. O erro estava na política, que permitia essa ação; corrigimos a política.
+- **Depois da correção: 100% (90 de 90)**, com 5 casos em que a checagem em código barrou uma ação da IA e ela se corrigiu.
+- Erros encontrados na revisão viraram regras verificadas em código: endereço inventado, previsão com data passada, ação errada para atraso real e detalhe interno (impressora, lote) na mensagem ao cliente.
 
 ## Premissas
 

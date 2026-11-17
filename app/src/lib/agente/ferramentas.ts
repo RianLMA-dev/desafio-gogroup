@@ -15,10 +15,10 @@ export const ACOES: Record<string, { rotulo: string; nivel: "auto" | "aprovacao"
   fechar_duplicado: { rotulo: "Fechar exceção duplicada", nivel: "auto", tipos: "todos" },
   comunicar_encerrar: { rotulo: "Pedir desculpas e encerrar", nivel: "auto", tipos: ["atraso_entrega"] },
   corrigir_promessa: { rotulo: "Avisar cliente da data correta", nivel: "auto", tipos: ["atraso_entrega", "rastreio_parado"] },
-  acionar_transportadora: { rotulo: "Abrir chamado na transportadora e avisar cliente", nivel: "auto", tipos: ["atraso_entrega", "rastreio_parado", "extravio", "devolvido_transportadora"] },
+  acionar_transportadora: { rotulo: "Abrir chamado na transportadora e avisar cliente", nivel: "auto", tipos: ["atraso_entrega", "rastreio_parado", "extravio"] },
   lembrete_pagamento: { rotulo: "Enviar lembrete com novo link de pagamento", nivel: "auto", tipos: ["pagamento_pendente"] },
   cancelar_pagamento: { rotulo: "Cancelar pedido não pago e liberar estoque", nivel: "auto", tipos: ["pagamento_pendente"] },
-  confirmar_endereco: { rotulo: "Pedir endereço completo ao cliente", nivel: "auto", tipos: ["endereco_divergente", "devolvido_transportadora"] },
+  confirmar_endereco: { rotulo: "Pedir endereço completo ao cliente", nivel: "auto", tipos: ["endereco_divergente"] },
   nova_producao: { rotulo: "Reproduzir personalização em outra impressora", nivel: "aprovacao", tipos: ["falha_personalizacao"] },
   reenvio_com_foto: { rotulo: "Pedir foto e reenviar sem custo", nivel: "aprovacao", tipos: ["avaria_transporte", "vazamento_produto", "item_faltante"] },
   reenvio_outro_lote: { rotulo: "Reenviar de outro lote (lote com defeito)", nivel: "aprovacao", tipos: ["vazamento_produto"] },
@@ -78,9 +78,9 @@ const INSTRUCOES: Record<string, string> = {
   promessa: "Bug na data prometida: informe ao cliente a data correta (prazo_correto) e peça desculpas pela informação errada.",
   rota_ne: "Rota Express com atraso no Nordeste: abra chamado com a Rota Express citando o pedido e avise o cliente com nova previsão.",
   carga_norte: "Carga Norte danificando frágeis: reenvie com embalagem reforçada e, se possível, por outra transportadora.",
-  imp02: "Esta peça foi feita na impressora IMP-02, que está com defeito. A nova produção deve ser feita na IMP-01 ou IMP-03 — nunca na IMP-02.",
+  imp02: "Esta peça foi feita na impressora IMP-02, que está com defeito. A nova produção deve ser feita na IMP-01 ou IMP-03 — nunca na IMP-02. Isso é só para a nota_interna: ao cliente, diga apenas que vamos produzir uma nova peça, sem citar impressora.",
   cd2_noite: "Erro de separação de kits com brinde no CD2 noite: o reenvio deve passar por conferência (bipagem) antes de sair.",
-  lote: "O produto deste pedido é do lote L2607-B, que tem defeito de vazamento. Use a ação reenvio_outro_lote e reenvie de QUALQUER lote, EXCETO o L2607-B.",
+  lote: "O produto deste pedido é do lote L2607-B, que tem defeito de vazamento. Use a ação reenvio_outro_lote e reenvie de QUALQUER lote, EXCETO o L2607-B. Isso é só para a nota_interna: ao cliente, diga apenas que vamos enviar um produto novo, sem citar lote ou defeito de fabricação.",
   kokeshi: "SKU vendido sem estoque: confira a previsão de reposição antes de oferecer troca.",
   duplicados: "Exceção duplicada: feche esta, a original segue em tratamento.",
 };
@@ -187,6 +187,10 @@ export function validarAcao(e: Excecao, acao: string, mensagem = ""): string | n
   if (a.tipos !== "todos" && !a.tipos.includes(e.tipo)) return `Ação "${acao}" não se aplica a ${e.tipo}. Consulte a política.`;
   if (acao === "fechar_duplicado" && !e.duplicado) return "Este caso não é duplicado.";
   if (acao === "corrigir_promessa" && !e.falso_atraso) return "corrigir_promessa só vale para falso atraso; este pedido está atrasado de verdade (veja verificar_prazo).";
+  // nada de problema interno na mensagem ao cliente (máquina, lote, CD, turno, incidente)
+  const interno = mensagem.match(/impressora|IMP-0\d|\blotes?\b|L26\d\d|\bCD ?[12]\b|\bturno\b|incidente/i);
+  if (interno) return `A mensagem ao cliente cita um detalhe interno ("${interno[0]}"). Explique o que vamos fazer por ele, sem citar máquina, lote, CD, turno ou incidente.`;
+  if (acao !== "fechar_duplicado" && mensagem.trim() && !mensagem.includes(`Equipe ${e.marca}`)) return `Assine a mensagem ao cliente como "Equipe ${e.marca}".`;
   const marcadores = (mensagem.match(/\[[^\]]*\]/g) ?? []).filter((m) => m !== "[link de pagamento]");
   if (marcadores.length) return `A mensagem tem campos a preencher (${marcadores.join(", ")}). Não temos esses dados: reescreva sem eles (ex.: peça ao cliente a informação).`;
   if (acao === "reenvio_com_foto" && e.causas.includes("lote")) return "Este produto é do lote L2607-B com defeito: use reenvio_outro_lote.";
