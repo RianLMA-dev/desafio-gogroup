@@ -51,10 +51,10 @@ export function Celular({ d, digitando, aprovacao, conversa, animarUltima = fals
           <span>9:41</span><span className="h-[14px] w-16 rounded-full bg-[#1d1d1f]" /><span>100%</span>
         </div>
         <div className="flex items-center gap-2 border-b border-black/5 bg-[#f7f7f5] px-3 pb-2">
-          <div className="flex h-8 w-8 items-center justify-center rounded-full bg-accent text-xs font-semibold text-white">{d?.marca?.[0] ?? "?"}</div>
+          <div className="flex h-8 w-8 items-center justify-center rounded-full bg-[#c9c4bb] text-xs font-semibold text-white">{d?.cliente?.[0] ?? "?"}</div>
           <div className="leading-tight">
-            <div className="text-[12px] font-semibold">{d ? d.marca : "…"}</div>
-            <div className="text-[10px] text-muted">conta comercial</div>
+            <div className="text-[12px] font-semibold">{d ? d.cliente : "…"}</div>
+            <div className="text-[10px] text-muted">{d ? `cliente · WhatsApp da ${d.marca}` : "cliente"}</div>
           </div>
         </div>
         <div ref={caixa} className="flex h-[380px] flex-col overflow-y-auto p-3">
